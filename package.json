@@ -1,7 +1,7 @@
 {
   "name": "electron-react-typescript",
   "version": "1.0.0",
-  "description": "A Electron boilerplate including TypeScript, React, Jest and ESLint.",
+  "description": "An Electron boilerplate including TypeScript, React, Jest and ESLint.",
   "main": "./dist/main.js",
   "scripts": {
     "dev:electron": "NODE_ENV=development webpack --config webpack/electron.webpack.js --mode development && electron .",
