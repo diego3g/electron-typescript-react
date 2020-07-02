@@ -1,10 +1,9 @@
 ## Electron + TypeScript + React
+Boilerplate for a project using Electron, React and Typescript
 
-Boilerplate para um projeto Electron utilizando Reactjs.
+## Installation
 
-## Instalação
-
-Use o gerenciador de pacotes de sua escolha (npm, yarn, etc.) para instalar as dependências
+Use a package manager of your choice (npm, yarn, etc.) in order to install all dependencies
 
 ```bash
 npm install
@@ -14,22 +13,22 @@ npm install
 yarn install
 ```
 
-## Uso
-
-Para executar o projeto abra 2 terminais e execute os scripts `dev:electron` em um terminal e `dev:react` no outro terminal
-
-```bash
-npm run dev:electron
-```
+## Usage
+In order to run this project 2 scripts will need to be executed `dev:react` and `dev:electron`, run each one in a different terminal and always run `dev:react` before `dev:electron`.
 
 ```bash
 npm run dev:react
 ```
+```bash
+npm run dev:electron
+```
 
-## Contribuindo
 
-Pull requests são bem vindas 😃.
 
-## Licença
+## Contributing
+
+Pull requests are always welcome 😃.
+
+## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
