@@ -21,7 +21,7 @@ module.exports = {
         }
       },
       {
-        test: /\.(png|jp?g|gif|svg)$/,
+        test: /\.(png|jpe?g|gif)$/,
         use: [
           {
             loader: 'url-loader',
@@ -33,6 +33,11 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack', 'url-loader'],
+      }
+      
     ]
   },
   devServer: {
