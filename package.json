@@ -52,8 +52,7 @@
     "wait-on": "^5.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
-    "yarn": "^1.22.4"
+    "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
     "react": "^16.13.1",
