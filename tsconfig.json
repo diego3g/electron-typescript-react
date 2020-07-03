@@ -8,6 +8,10 @@
       "es2016",
       "es2017"
     ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ],
     "allowJs": true,
     "jsx": "react",
     "sourceMap": true,
