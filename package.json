@@ -50,13 +50,13 @@
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
-    "commitizen": "^4.0.3",
-    "cz-conventional-changelog": "3.0.2",
-    "husky": "^4.0.3",
-    "lint-staged": "^9.5.0",
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^8.3.4",
-    "@commitlint/core": "^8.3.5"
+    "commitizen": "^4.1.2",
+    "cz-conventional-changelog": "3.2.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "@commitlint/cli": "^9.0.1",
+    "@commitlint/config-conventional": "^9.0.1",
+    "@commitlint/core": "^9.0.1"
   },
   "dependencies": {
     "react": "^16.13.1",
