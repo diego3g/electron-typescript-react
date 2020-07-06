@@ -1,15 +1,11 @@
 import React from 'react'
 
-import { Container, Image, Text } from './styles'
-import logo from '../../assets/logo.svg'
+import { Container, Text, Logo } from './styles'
 
 const Greetings: React.FC = () => {
   return (
     <Container>
-      <Image
-        src={logo}
-        alt="ReactJS logo"
-      />
+      <Logo/>
       <Text>An Electron boilerplate including TypeScript, React, Jest and ESLint.</Text>
     </Container>
   )

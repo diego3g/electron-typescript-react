@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components'
+import { ReactComponent as ReactLogo } from '../../assets/logo.svg'
 
 const rotate = keyframes`
   from {
@@ -18,8 +19,9 @@ export const Container = styled.div`
     justify-content: center;
 `
 
-export const Image = styled.img`
+export const Logo = styled(ReactLogo)`
     width: 300px;
+    height: 300px;
     animation: ${rotate} 15s linear infinite;
     opacity: 0.1;
 `
