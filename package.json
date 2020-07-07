@@ -13,6 +13,8 @@
     "build:run": "npm-run-all build start:electron",
     "build:electron": "webpack --config webpack/electron.webpack.js",
     "build:react": "webpack --config webpack/react.webpack.js",
+    "package": "npm-run-all build package:dist",
+    "package:dist": "electron-builder --dir",
     "test": "jest"
   },
   "keywords": [],
@@ -40,6 +42,7 @@
     "cross-env": "^7.0.2",
     "cz-conventional-changelog": "3.2.0",
     "electron": "^8.2.2",
+    "electron-builder": "^22.7.0",
     "electron-devtools-installer": "^3.1.0",
     "eslint": "^7.3.1",
     "eslint-config-prettier": "^6.11.0",
@@ -68,6 +71,19 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"
+  },
+  "build": {
+    "appId": "your.id",
+    "mac": {
+      "category": "public.app-category.video"
+    },
+    "directories": {
+      "output": "packages"
+    },
+    "files": [
+      "package.json",
+      "dist/**"
+    ]
   },
   "config": {
     "commitizen": {
