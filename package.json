@@ -22,9 +22,12 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.9.4",
     "@babel/preset-typescript": "^7.9.0",
+    "@babel/runtime": "^7.11.2",
     "@commitlint/cli": "^9.0.1",
     "@commitlint/config-conventional": "^10.0.0",
     "@commitlint/core": "^9.0.1",
@@ -68,6 +71,8 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "discord.js": "^12.3.1",
+    "encoding": "^0.1.13",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"
