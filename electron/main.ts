@@ -10,9 +10,8 @@ let mainWindow: Electron.BrowserWindow | null
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 700,
-    backgroundColor: '#191622',
+    width: 600,
+    height: 800,
     webPreferences: {
       nodeIntegration: true
     }

@@ -1,36 +1,46 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { render } from 'react-dom'
 import { GlobalStyle } from './styles/GlobalStyle'
-import { Select, Option } from './components/Select'
+import { DiscordClientProvider } from './contexts/DiscordClientContext'
+import { DiscordBotProvider } from './contexts/DiscordBotContext'
+import { ProfileInfo } from './sections/ProfileInfo'
 
-import Greetings from './components/Greetings'
-import {
-  DiscordClientContext,
-  DiscordClientProvider
-} from './components/DiscordClientContext'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 const mainElement = document.createElement('div')
 mainElement.setAttribute('id', 'root')
 document.body.appendChild(mainElement)
 
-const WrappedComponent = () => {
-  const client = useContext(DiscordClientContext)
-  if (client) {
-    console.log(client)
-  }
-  return <div>Hello!</div>
-}
-
 const App = () => {
+  const theme = createMuiTheme({
+    palette: {
+      type: 'dark'
+    },
+    typography: {
+      fontFamily: [
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"'
+      ].join(',')
+    }
+  })
+  console.log(theme)
   return (
     <DiscordClientProvider>
-      <GlobalStyle />
-      <Select>
-        <Option value="value1">Value 1</Option>
-        <Option value="value2">Value 2</Option>
-        <div>Hello world!</div>
-      </Select>
-      <WrappedComponent />
+      <DiscordBotProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ProfileInfo />
+        </ThemeProvider>
+      </DiscordBotProvider>
     </DiscordClientProvider>
   )
 }

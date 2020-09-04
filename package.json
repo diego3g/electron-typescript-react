@@ -44,7 +44,6 @@
     "commitizen": "^4.2.1",
     "cross-env": "^7.0.2",
     "cz-conventional-changelog": "3.2.0",
-    "electron": "^8.2.2",
     "electron-builder": "^22.7.0",
     "electron-devtools-installer": "^3.1.1",
     "eslint": "^7.3.1",
@@ -71,7 +70,9 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
     "discord.js": "^12.3.1",
+    "electron": "^10.1.1",
     "encoding": "^0.1.13",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

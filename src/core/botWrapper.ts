@@ -54,6 +54,34 @@ export class BotWrapper {
     }
   }
 
+  get name () {
+    if (this.client && this.client.user) {
+      return this.client.user.username
+    }
+  }
+
+  /**
+   * A simple wrapper to get the image url for the avatar
+   *
+   * @NOTE honestly, this is pretty much just calling an existing
+   * "user" method. It might be better to get rid of these methods
+   * entirely and just expose a method for accessing the client's
+   * user. This would also get rid of the "id" prop
+   */
+  getAvatarUrl () {
+    if (this.client && this.client.user) {
+      return this.client.user.displayAvatarURL()
+    }
+  }
+
+  /**
+   * Returns a list of all the servers the bot can stream
+   * audio in.
+   */
+  getJoinedServers (): Guild[] {
+    return Array.from(this.client.guilds.cache.values())
+  }
+
   /**
    * Return all the voice channels our bot can join
    */

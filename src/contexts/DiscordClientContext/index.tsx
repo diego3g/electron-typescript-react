@@ -1,3 +1,8 @@
+/**
+ * Context for initializing a Discord client. Intentionally
+ * keeping this light and separate from the "bot" context
+ * in case we want to use the client for something else.
+ */
 import React, { createContext, useEffect, useState } from 'react'
 import { Client } from 'discord.js'
 
