@@ -20,8 +20,8 @@ import {
   StreamDispatcher,
   Client,
   ClientPresenceStatus,
-  TextChannel
-} from 'discord.js'
+  TextChannel,
+} from 'discord.js';
 
 type VoiceChannelInfo = {
   server: Guild;
@@ -44,19 +44,19 @@ export class BotWrapper {
    */
   private client: Client;
 
-  constructor (client: Client) {
-    this.client = client
+  constructor(client: Client) {
+    this.client = client;
   }
 
-  get id (): string | undefined {
+  get id(): string | undefined {
     if (this.client && this.client.user) {
-      return this.client.user.id
+      return this.client.user.id;
     }
   }
 
-  get name (): string | undefined {
+  get name(): string | undefined {
     if (this.client && this.client.user) {
-      return this.client.user.username
+      return this.client.user.username;
     }
   }
 
@@ -68,9 +68,9 @@ export class BotWrapper {
    * entirely and just expose a method for accessing the client's
    * user. This would also get rid of the "id" prop
    */
-  getAvatarUrl (): string | undefined {
+  getAvatarUrl(): string | undefined {
     if (this.client && this.client.user) {
-      return this.client.user.displayAvatarURL()
+      return this.client.user.displayAvatarURL();
     }
   }
 
@@ -78,77 +78,77 @@ export class BotWrapper {
    * Returns a list of all the servers the bot can stream
    * audio in.
    */
-  getJoinedServers (): Guild[] {
-    return Array.from(this.client.guilds.cache.values())
+  getJoinedServers(): Guild[] {
+    return Array.from(this.client.guilds.cache.values());
   }
 
   /**
    * Return all the voice channels our bot can join
    */
-  getVoiceChannels (server: Guild): VoiceChannel[] {
+  getVoiceChannels(server: Guild): VoiceChannel[] {
     return Array.from(
       server.channels.cache
         .filter((channel) => channel.type === 'voice')
         .values()
-    ) as VoiceChannel[]
+    ) as VoiceChannel[];
   }
 
   /**
    * Return a list of all the voice channels our bot is
    * currently active in
    */
-  getActiveVoiceChannels (): VoiceChannel[] {
-    return Array.from(this.channels.keys())
+  getActiveVoiceChannels(): VoiceChannel[] {
+    return Array.from(this.channels.keys());
   }
 
   /**
    * Join a voice channel
    */
-  async join (voiceChannel: VoiceChannel): Promise<void> {
-    const connection = await voiceChannel.join()
+  async join(voiceChannel: VoiceChannel): Promise<void> {
+    const connection = await voiceChannel.join();
     // connection.on("debug", console.log);
     this.channels.set(voiceChannel, {
       server: voiceChannel.guild,
-      connection
-    })
+      connection,
+    });
   }
 
   /**
    * Leave a voice channel, as long as we're currently
    * maintaining a connection to it.
    */
-  leave (voiceChannel: VoiceChannel): void {
-    const info = this.channels.get(voiceChannel)
+  leave(voiceChannel: VoiceChannel): void {
+    const info = this.channels.get(voiceChannel);
     if (!info) {
-      return
+      return;
     }
     // cleanup our connections before leaving the channel
-    const { connection } = info
-    connection.disconnect()
+    const { connection } = info;
+    connection.disconnect();
     // leave the channel and remove it from our list
-    voiceChannel.leave()
-    this.channels.delete(voiceChannel)
+    voiceChannel.leave();
+    this.channels.delete(voiceChannel);
   }
 
   /**
    * If we're in channel, start streaming audio in it
    */
-  async play (
+  async play(
     voiceChannel: VoiceChannel,
     stream: VoiceConnectionStream
   ): Promise<void> {
-    const info = this.channels.get(voiceChannel)
+    const info = this.channels.get(voiceChannel);
     // if we don't have a dispatcher that's playing audio,
     // create one and add it to our info object
     if (info && !info.dispatcher) {
-      const dispatcher = info.connection.play(stream)
-      this.channels.set(voiceChannel, { ...info, dispatcher })
+      const dispatcher = info.connection.play(stream);
+      this.channels.set(voiceChannel, { ...info, dispatcher });
     }
   }
 
-  isPlaying (voiceChannel: VoiceChannel): boolean {
-    const info = this.channels.get(voiceChannel)
-    return !!(info && info.dispatcher)
+  isPlaying(voiceChannel: VoiceChannel): boolean {
+    const info = this.channels.get(voiceChannel);
+    return !!(info && info.dispatcher);
   }
 
   /**
@@ -161,29 +161,29 @@ export class BotWrapper {
    *
    * ~reccanti 8/29/2020
    */
-  silence (voiceChannel: VoiceChannel): void {
-    const info = this.channels.get(voiceChannel)
+  silence(voiceChannel: VoiceChannel): void {
+    const info = this.channels.get(voiceChannel);
     if (!info) {
-      return
+      return;
     }
-    const { dispatcher, ...remainingInfo } = info
+    const { dispatcher, ...remainingInfo } = info;
     if (dispatcher) {
-      dispatcher.destroy()
-      this.channels.set(voiceChannel, remainingInfo)
+      dispatcher.destroy();
+      this.channels.set(voiceChannel, remainingInfo);
     }
   }
 
   /**
    * Set the Status of the bot
    */
-  async setStatus (status: ClientPresenceStatus): Promise<void> {
-    await this.client.user?.setStatus(status)
+  async setStatus(status: ClientPresenceStatus): Promise<void> {
+    await this.client.user?.setStatus(status);
   }
 
   /**
    * Send a text message to a channel
    */
-  async sendMessage (channel: TextChannel, message: string): Promise<void> {
-    await channel.send(message)
+  async sendMessage(channel: TextChannel, message: string): Promise<void> {
+    await channel.send(message);
   }
 }
