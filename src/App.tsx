@@ -1,9 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { GlobalStyle } from './styles/GlobalStyle'
 import { DiscordClientProvider } from './contexts/DiscordClientContext'
 import { DiscordBotProvider } from './contexts/DiscordBotContext'
 import { ProfileInfo } from './sections/ProfileInfo'
+import { ChannelSelect } from './sections/ChannelSelect'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -39,6 +39,7 @@ const App = () => {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <ProfileInfo />
+          <ChannelSelect />
         </ThemeProvider>
       </DiscordBotProvider>
     </DiscordClientProvider>

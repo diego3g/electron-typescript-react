@@ -48,13 +48,13 @@ export class BotWrapper {
     this.client = client
   }
 
-  get id () {
+  get id (): string | undefined {
     if (this.client && this.client.user) {
       return this.client.user.id
     }
   }
 
-  get name () {
+  get name (): string | undefined {
     if (this.client && this.client.user) {
       return this.client.user.username
     }
@@ -68,7 +68,7 @@ export class BotWrapper {
    * entirely and just expose a method for accessing the client's
    * user. This would also get rid of the "id" prop
    */
-  getAvatarUrl () {
+  getAvatarUrl (): string | undefined {
     if (this.client && this.client.user) {
       return this.client.user.displayAvatarURL()
     }
@@ -86,9 +86,11 @@ export class BotWrapper {
    * Return all the voice channels our bot can join
    */
   getVoiceChannels (server: Guild): VoiceChannel[] {
-    return Object.values(
-      server.channels.cache.filter((channel) => channel.type === 'voice')
-    )
+    return Array.from(
+      server.channels.cache
+        .filter((channel) => channel.type === 'voice')
+        .values()
+    ) as VoiceChannel[]
   }
 
   /**
@@ -174,7 +176,7 @@ export class BotWrapper {
   /**
    * Set the Status of the bot
    */
-  async setStatus (status: ClientPresenceStatus) {
+  async setStatus (status: ClientPresenceStatus): Promise<void> {
     await this.client.user?.setStatus(status)
   }
 
