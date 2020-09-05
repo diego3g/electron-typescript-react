@@ -11,7 +11,15 @@
 
 import { Client } from 'discord.js';
 import { ipcMain } from 'electron';
+import fs from 'fs';
+import path from 'path';
 import { BotWrapper } from './botWrapper';
+
+type VoiceChannelInfo = {
+  id: string;
+  serverId: string;
+  name: string;
+};
 
 export function setupMainListener(cb: () => void): void {
   /**
@@ -56,25 +64,35 @@ export function setupMainListener(cb: () => void): void {
 
     ipcMain.handle(
       'join-channel',
-      (_e, channelInfo: { id: string; name: string; serverId: string }) => {
-        console.log('joining channel: ' + channelInfo.id);
-
+      async (_e, channelInfo: VoiceChannelInfo) => {
         const server = bot
           .getJoinedServers()
           .find((server) => server.id === channelInfo.serverId);
-        if (!server) {
-          return;
-        }
+        if (!server) return;
 
         const channel = bot
           .getVoiceChannelsInServer(server)
           .find((channel) => channel.id === channelInfo.id);
+        if (!channel) return;
 
-        if (channel) {
-          bot.join(channel);
-        }
+        const loudredCry = fs.createReadStream(
+          path.resolve(__dirname, '../../assets/loudred-cry.webm')
+        );
+        await bot.join(channel);
+        await bot.play(channel, loudredCry, { type: 'webm/opus' }, () => {
+          bot.silence(channel);
+        });
       }
     );
+
+    ipcMain.handle('leave-channel', (_e, channelInfo: VoiceChannelInfo) => {
+      const channel = bot
+        .getActiveVoiceChannels()
+        .find((channel) => channel.id === channelInfo.id);
+      if (!channel) return;
+
+      bot.leave(channel);
+    });
 
     cb();
   });

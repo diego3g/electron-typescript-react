@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ipcRenderer } from 'electron';
 
+import { useStateMemoArray } from './useStateMemoArray';
+
 export type ServerInfo = {
   name: string;
   id: string;
@@ -13,74 +15,42 @@ export type VoiceChannelInfo = {
 };
 
 export function useJoinedServers(): ServerInfo[] {
-  const [servers, setServers] = useState<ServerInfo[]>([]);
-
-  // a list of IDs to check before we update our server list
-  const serverLookup = new Set<string>();
-  servers.forEach((server) => {
-    serverLookup.add(server.id);
-  });
-
+  const [servers, setServers] = useStateMemoArray<ServerInfo, string>(
+    [],
+    (info) => info.id
+  );
   ipcRenderer.invoke('get-joined-servers').then((servers) => {
-    for (const server of servers) {
-      /**
-       * @NOTE This is kind of gross. We only want to update
-       * our list of servers if something has changed. However,
-       * because we create new objects in the backend each time,
-       * this will always be true, resulting in infinite rerenders.
-       * Therefore, we add this check against the lookup table before
-       * deciding to update our list of servers
-       *
-       * ~reccanti 9/5/2020
-       */
-      if (!serverLookup.has(server.id)) {
-        setServers(servers);
-        break;
-      }
-    }
+    setServers(servers);
   });
-
   return servers;
 }
 
 export function useVoiceChannelsInServer(serverId: string): VoiceChannelInfo[] {
-  const [voiceChannels, setVoiceChannels] = useState<VoiceChannelInfo[]>([]);
-
-  const voiceChannelLookup = new Set<string>();
-  voiceChannels.forEach((channel) => {
-    voiceChannelLookup.add(channel.id);
-  });
-
+  const [voiceChannels, setVoiceChannels] = useStateMemoArray<
+    VoiceChannelInfo,
+    string
+  >([], (info) => info.id);
   ipcRenderer.invoke('get-voice-channels', serverId).then((voiceChannels) => {
-    for (const channel of voiceChannels) {
-      if (!voiceChannelLookup.has(channel.id)) {
-        setVoiceChannels(voiceChannels);
-        break;
-      }
-    }
+    setVoiceChannels(voiceChannels);
   });
   return voiceChannels;
 }
 
 export function useActiveVoiceChannels(): VoiceChannelInfo[] {
-  const [voiceChannels, setVoiceChannels] = useState<VoiceChannelInfo[]>([]);
-
-  const voiceChannelLookup = new Set<string>();
-  voiceChannels.forEach((channel) => {
-    voiceChannelLookup.add(channel.id);
-  });
-
+  const [voiceChannels, setVoiceChannels] = useStateMemoArray<
+    VoiceChannelInfo,
+    string
+  >([], (info) => info.id);
   ipcRenderer.invoke('get-active-voice-channels').then((voiceChannels) => {
-    for (const channel of voiceChannels) {
-      if (!voiceChannelLookup.has(channel.id)) {
-        setVoiceChannels(voiceChannels);
-        break;
-      }
-    }
+    setVoiceChannels(voiceChannels);
   });
   return voiceChannels;
 }
 
 export function join(channel: VoiceChannelInfo): void {
   ipcRenderer.invoke('join-channel', channel);
+}
+
+export function leave(channel: VoiceChannelInfo): void {
+  ipcRenderer.invoke('leave-channel', channel);
 }

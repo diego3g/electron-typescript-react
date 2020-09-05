@@ -32,6 +32,7 @@ type VoiceChannelInfo = {
 // utility type to get the types of streams that the VoiceConnection "play"
 // method can accept
 type VoiceConnectionStream = Parameters<VoiceConnection['play']>[0];
+type VoiceConnectionSettings = Parameters<VoiceConnection['play']>[1];
 
 export class BotWrapper {
   /**
@@ -135,13 +136,25 @@ export class BotWrapper {
    */
   async play(
     voiceChannel: VoiceChannel,
-    stream: VoiceConnectionStream
+    stream: VoiceConnectionStream,
+    options?: VoiceConnectionSettings,
+    cb?: () => void
   ): Promise<void> {
     const info = this.channels.get(voiceChannel);
-    // if we don't have a dispatcher that's playing audio,
-    // create one and add it to our info object
-    if (info && !info.dispatcher) {
-      const dispatcher = info.connection.play(stream);
+    // create a new dispatcher and add it to our info object.
+    // this will overwrite any existing dispatchers
+    if (info) {
+      let dispatcher;
+      if (options) {
+        dispatcher = info.connection.play(stream, options);
+      } else {
+        dispatcher = info.connection.play(stream);
+      }
+      if (cb) {
+        dispatcher.on('finish', () => {
+          cb();
+        });
+      }
       this.channels.set(voiceChannel, { ...info, dispatcher });
     }
   }

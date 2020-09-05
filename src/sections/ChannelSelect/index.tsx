@@ -23,6 +23,7 @@ import {
   useVoiceChannelsInServer,
   useActiveVoiceChannels,
   join,
+  leave,
 } from '../../hooks/discordBotHooks';
 
 type ServerSelectProps = {
@@ -119,6 +120,7 @@ export const ChannelSelect: React.FC = () => {
               if (!activeChannelLookup.has(channel.id)) {
                 join(channel);
               }
+              leave(channel);
             }}
           >
             <ListItemIcon>
