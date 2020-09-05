@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["dom", "es2015", "es2016", "es2017"],
+    "types": ["react"],
+    "allowJs": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "outDir": "./dist-server",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["electron/**/*"]
+}
