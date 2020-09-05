@@ -18,9 +18,7 @@ function createWindow() {
     },
   });
 
-  console.log(process.env.NODE_ENV);
   if (process.env.NODE_ENV === 'development') {
-    console.log('creating window');
     mainWindow.loadURL('http://localhost:4000');
   } else {
     mainWindow.loadURL(
@@ -39,8 +37,7 @@ function createWindow() {
 
 app
   .on('ready', () => {
-    setupMainListener();
-    createWindow();
+    setupMainListener(createWindow);
   })
   .whenReady()
   .then(() => {

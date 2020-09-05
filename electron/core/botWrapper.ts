@@ -85,7 +85,7 @@ export class BotWrapper {
   /**
    * Return all the voice channels our bot can join
    */
-  getVoiceChannels(server: Guild): VoiceChannel[] {
+  getVoiceChannelsInServer(server: Guild): VoiceChannel[] {
     return Array.from(
       server.channels.cache
         .filter((channel) => channel.type === 'voice')

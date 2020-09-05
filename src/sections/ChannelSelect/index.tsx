@@ -6,8 +6,7 @@
  * best way to do that might be at this time
  * ~reccanti 9/4/2020
  */
-import React, { useContext, useState } from 'react'
-import { Guild, VoiceChannel } from 'discord.js'
+import React, { useState } from 'react';
 import {
   InputLabel,
   NativeSelect,
@@ -15,39 +14,45 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Checkbox
-} from '@material-ui/core'
+  Checkbox,
+} from '@material-ui/core';
 
-import { DiscordBotContext } from '../../contexts/DiscordBotContext'
+import {
+  ServerInfo,
+  useJoinedServers,
+  useVoiceChannelsInServer,
+  useActiveVoiceChannels,
+  join,
+} from '../../hooks/discordBotHooks';
 
 type ServerSelectProps = {
-  value: Guild | null;
-  servers: Guild[];
-  onChange: (server: Guild) => void;
+  value: string | null;
+  servers: ServerInfo[];
+  onChange: (server: ServerInfo) => void;
 };
 const ServerSelect: React.FC<ServerSelectProps> = ({
   value,
   servers,
-  onChange
+  onChange,
 }) => {
   /**
    * Create a lookup map that associates servers with their
    * id. We'll use this to send the selected server to the
    * "onChange" method when the user selects it
    */
-  const serverLookup = new Map<string, Guild>()
+  const serverLookup = new Map<string, ServerInfo>();
   servers.forEach((server) => {
-    serverLookup.set(server.id, server)
-  })
+    serverLookup.set(server.id, server);
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const serverName = event.target.value
-    const server = serverLookup.get(serverName)
+    const serverName = event.target.value;
+    const server = serverLookup.get(serverName);
     if (!server) {
-      throw Error('Unable to find the server you selected')
+      throw Error('Unable to find the server you selected');
     }
-    onChange(server)
-  }
+    onChange(server);
+  };
 
   return (
     <>
@@ -57,7 +62,7 @@ const ServerSelect: React.FC<ServerSelectProps> = ({
       <NativeSelect
         id="ChannelSelect-serverSelect"
         variant="outlined"
-        value={(value && value.id) || ''}
+        value={value || ''}
         onChange={handleChange}
       >
         <option value="" aria-label="none">
@@ -70,65 +75,60 @@ const ServerSelect: React.FC<ServerSelectProps> = ({
         ))}
       </NativeSelect>
     </>
-  )
-}
+  );
+};
 
 export const ChannelSelect: React.FC = () => {
-  const [server, setServer] = useState<Guild | null>(null)
-  const bot = useContext(DiscordBotContext)
+  const [selectedServer, setSelectedServer] = useState<ServerInfo | null>(null);
+  const servers = useJoinedServers();
+  const voiceChannels = useVoiceChannelsInServer(
+    selectedServer ? selectedServer.id : ''
+  );
+  const activeVoiceChannels = useActiveVoiceChannels();
 
-  const servers = bot ? bot.getJoinedServers() : []
-  const handleSelectServer = (server: Guild) => {
-    setServer(server)
-  }
+  console.log(selectedServer);
 
   // initialize info about our voice channels
-  const channels = new Set<VoiceChannel>()
-  const activeChannels = new Set<VoiceChannel>()
-  if (bot && server) {
-    bot.getVoiceChannels(server).forEach((channel) => {
-      channels.add(channel)
-    })
-    bot
-      .getActiveVoiceChannels()
-      .filter((channel) => channel.guild === server)
-      .forEach((channel) => {
-        activeChannels.add(channel)
-      })
-  }
+  const activeChannelLookup = new Set<string>();
+  activeVoiceChannels.forEach((channel) => {
+    activeChannelLookup.add(channel.id);
+  });
+
+  const handleSelectServer = (serverInfo: ServerInfo) => {
+    console.log(serverInfo);
+    setSelectedServer(serverInfo);
+  };
 
   return (
     <div>
-      <div>Current Server: {(server && server.name) || 'None'}</div>
+      <div>
+        Current Server: {(selectedServer && selectedServer.name) || 'None'}
+      </div>
       <ServerSelect
-        value={server}
+        value={selectedServer ? selectedServer.id : ''}
         onChange={handleSelectServer}
         servers={servers}
       />
       <List>
-        {Array.from(channels.values()).map((channel) => (
+        {voiceChannels.map((channel) => (
           <ListItem
             dense
             button
             key={channel.id}
             onClick={() => {
-              if (!bot) {
-                return
-              }
-              if (activeChannels.has(channel)) {
-                bot.leave(channel)
-              } else {
-                bot.join(channel)
+              if (!activeChannelLookup.has(channel.id)) {
+                join(channel);
               }
             }}
           >
             <ListItemIcon>
-              <Checkbox checked={activeChannels.has(channel)} />
+              <Checkbox checked={activeChannelLookup.has(channel.id)} />
             </ListItemIcon>
             <ListItemText primary={channel.name} />
           </ListItem>
         ))}
       </List>
     </div>
-  )
-}
+  );
+  //   return <div>Hello world</div>;
+};
