@@ -16,7 +16,8 @@
     "package": "npm-run-all build package:dist",
     "package:dist": "electron-builder --dir",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "node ./scripts/rebuild.js"
   },
   "keywords": [],
   "author": "Diego Fernandes <diego.schell.f@gmail.com>",
@@ -48,6 +49,7 @@
     "cz-conventional-changelog": "3.2.0",
     "electron-builder": "^22.7.0",
     "electron-devtools-installer": "^3.1.1",
+    "electron-rebuild": "^2.0.1",
     "eslint": "^7.3.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
@@ -72,12 +74,12 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "@discordjs/opus": "^0.3.2",
     "@material-ui/core": "^4.11.0",
     "discord.js": "^12.3.1",
     "electron": "^10.1.1",
     "encoding": "^0.1.13",
     "ffmpeg-static": "^4.2.7",
-    "opusscript": "0.0.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"
