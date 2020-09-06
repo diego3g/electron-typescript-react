@@ -5,7 +5,7 @@ import installExtension, {
   REACT_DEVELOPER_TOOLS,
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer';
-import { setupMainListener } from './core/mainBotListener';
+import { asyncSetupMainListener } from './core/mainBotListener';
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -16,6 +16,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
+    titleBarStyle: 'hidden',
   });
 
   if (process.env.NODE_ENV === 'development') {
@@ -36,8 +37,9 @@ function createWindow() {
 }
 
 app
-  .on('ready', () => {
-    setupMainListener(createWindow);
+  .on('ready', async () => {
+    await asyncSetupMainListener();
+    createWindow();
   })
   .whenReady()
   .then(() => {

@@ -99,3 +99,9 @@ export function setupMainListener(cb: () => void): void {
 
   client.login(process.env.DISCORD_BOT_TOKEN);
 }
+
+export function asyncSetupMainListener(): Promise<void> {
+  return new Promise((resolve) => {
+    setupMainListener(resolve);
+  });
+}

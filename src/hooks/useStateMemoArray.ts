@@ -32,6 +32,12 @@ export function useStateMemoArray<T, U>(
    * ~reccanti 9/5/2020
    */
   function setArrMemoized(newArr: T[]) {
+    // if the lengths aren't equal, we know something changed,
+    // so we don't have to bother iterating over everything
+    if (arr.length !== newArr.length) {
+      setArr(newArr);
+      return;
+    }
     for (const item of newArr) {
       const lookupValue = memoFunc(item);
       if (!lookup.has(lookupValue)) {

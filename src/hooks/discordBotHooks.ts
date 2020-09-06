@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { ipcRenderer } from 'electron';
-
 import { useStateMemoArray } from './useStateMemoArray';
 
 export type ServerInfo = {
@@ -36,21 +34,35 @@ export function useVoiceChannelsInServer(serverId: string): VoiceChannelInfo[] {
   return voiceChannels;
 }
 
-export function useActiveVoiceChannels(): VoiceChannelInfo[] {
+export function useActiveVoiceChannels(): {
+  channels: VoiceChannelInfo[];
+  joinChannel: (channel: VoiceChannelInfo) => void;
+  leaveChannel: (channel: VoiceChannelInfo) => void;
+} {
   const [voiceChannels, setVoiceChannels] = useStateMemoArray<
     VoiceChannelInfo,
     string
   >([], (info) => info.id);
-  ipcRenderer.invoke('get-active-voice-channels').then((voiceChannels) => {
-    setVoiceChannels(voiceChannels);
-  });
-  return voiceChannels;
-}
 
-export function join(channel: VoiceChannelInfo): void {
-  ipcRenderer.invoke('join-channel', channel);
-}
+  function updateVoiceChannels() {
+    ipcRenderer.invoke('get-active-voice-channels').then((voiceChannels) => {
+      setVoiceChannels(voiceChannels);
+    });
+  }
 
-export function leave(channel: VoiceChannelInfo): void {
-  ipcRenderer.invoke('leave-channel', channel);
+  function joinChannel(channel: VoiceChannelInfo): void {
+    ipcRenderer.invoke('join-channel', channel).then(updateVoiceChannels);
+  }
+
+  function leaveChannel(channel: VoiceChannelInfo): void {
+    ipcRenderer.invoke('leave-channel', channel).then(updateVoiceChannels);
+  }
+
+  updateVoiceChannels();
+
+  return {
+    channels: voiceChannels,
+    joinChannel,
+    leaveChannel,
+  };
 }
