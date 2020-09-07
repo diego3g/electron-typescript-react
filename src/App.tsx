@@ -9,10 +9,20 @@ import {
 import {
   DeviceSelect,
   DeviceSelectProvider,
+  StartButton,
+  StopButton,
 } from './sections/DeviceSelect/index';
-import { CssBaseline, Box } from '@material-ui/core';
+import {
+  CssBaseline,
+  Box,
+  BottomNavigation,
+  BottomNavigationAction,
+} from '@material-ui/core';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
+/**
+ * Setup the page by applying elements and style tags to hook into
+ */
 const mainElement = document.createElement('div');
 mainElement.setAttribute('id', 'root');
 document.body.appendChild(mainElement);
@@ -25,6 +35,9 @@ html {
 }`;
 document.head.appendChild(style);
 
+/**
+ * Define a wrapper that sets up all of our Providers
+ */
 const App = () => {
   const theme = createMuiTheme({
     palette: {
@@ -46,19 +59,21 @@ const App = () => {
     },
   });
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box p={theme.spacing(1)}>
-        {/* <ProfileInfo /> */}
-        <ChannelSelectProvider>
-          <ServerSelect />
-          <ChannelList />
-        </ChannelSelectProvider>
-        <DeviceSelectProvider>
-          <DeviceSelect />
-        </DeviceSelectProvider>
-      </Box>
-    </ThemeProvider>
+    <ChannelSelectProvider>
+      <DeviceSelectProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Box p={theme.spacing(1)}>
+            {/* <ProfileInfo /> */}
+            <ServerSelect />
+            <ChannelList />
+            <DeviceSelect />
+            <StartButton />
+            <StopButton />
+          </Box>
+        </ThemeProvider>
+      </DeviceSelectProvider>
+    </ChannelSelectProvider>
   );
 };
 

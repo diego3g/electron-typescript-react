@@ -9,16 +9,22 @@
  * to cover more than just "bot" messages
  */
 
-import { Client } from 'discord.js';
+import { Client, VoiceBroadcast } from 'discord.js';
 import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { BotWrapper } from './botWrapper';
 import portAudio from 'naudiodon';
+import { createDeviceBroadcastStream } from './deviceBroadcastStream';
 
 type VoiceChannelInfo = {
   id: string;
   serverId: string;
+  name: string;
+};
+
+type DeviceInfo = {
+  id: number;
   name: string;
 };
 
@@ -30,6 +36,9 @@ export function setupMainListener(cb: () => void): void {
 
   client.on('ready', () => {
     const bot = new BotWrapper(client);
+
+    // let broadcastDevice: Device | null = null;
+    let broadcastStream: VoiceBroadcast | null = null;
 
     ipcMain.handle('get-joined-servers', () =>
       Promise.resolve(
@@ -100,6 +109,25 @@ export function setupMainListener(cb: () => void): void {
         .getDevices()
         .map((device) => ({ name: device.name, id: device.id }));
       return Promise.resolve(devices);
+    });
+
+    ipcMain.handle('start-broadcast', (_e, deviceInfo: DeviceInfo) => {
+      const device = portAudio
+        .getDevices()
+        .find((device) => device.id === deviceInfo.id);
+      if (device) {
+        broadcastStream = createDeviceBroadcastStream(client, device);
+        bot.getActiveVoiceChannels().forEach((channel) => {
+          // casting here because we just set broadcastStream as a value above
+          bot.play(channel, broadcastStream as VoiceBroadcast);
+        });
+      }
+    });
+
+    ipcMain.handle('stop-broadcast', () => {
+      bot.getActiveVoiceChannels().forEach((channel) => {
+        bot.silence(channel);
+      });
     });
 
     cb();

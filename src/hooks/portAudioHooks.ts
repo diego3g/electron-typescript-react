@@ -19,3 +19,11 @@ export function useDevices(): DeviceInfo[] {
   });
   return devices;
 }
+
+export function startBroadcast(device: DeviceInfo) {
+  ipcRenderer.invoke('start-broadcast', device);
+}
+
+export function stopBroadcast() {
+  ipcRenderer.invoke('stop-broadcast');
+}
