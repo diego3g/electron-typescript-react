@@ -6,6 +6,10 @@ import {
   ChannelList,
   ChannelSelectProvider,
 } from './sections/ChannelSelect/index';
+import {
+  DeviceSelect,
+  DeviceSelectProvider,
+} from './sections/DeviceSelect/index';
 import { CssBaseline, Box } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
@@ -17,6 +21,7 @@ const style = document.createElement('style');
 style.innerHTML = `
 html {
   -webkit-app-region: drag;
+  height: 100%;
 }`;
 document.head.appendChild(style);
 
@@ -49,6 +54,9 @@ const App = () => {
           <ServerSelect />
           <ChannelList />
         </ChannelSelectProvider>
+        <DeviceSelectProvider>
+          <DeviceSelect />
+        </DeviceSelectProvider>
       </Box>
     </ThemeProvider>
   );

@@ -80,6 +80,7 @@
     "electron": "^10.1.1",
     "encoding": "^0.1.13",
     "ffmpeg-static": "^4.2.7",
+    "naudiodon": "^2.2.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"

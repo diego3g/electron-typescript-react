@@ -14,6 +14,7 @@ import { ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { BotWrapper } from './botWrapper';
+import portAudio from 'naudiodon';
 
 type VoiceChannelInfo = {
   id: string;
@@ -92,6 +93,13 @@ export function setupMainListener(cb: () => void): void {
       if (!channel) return;
 
       bot.leave(channel);
+    });
+
+    ipcMain.handle('get-devices', () => {
+      const devices = portAudio
+        .getDevices()
+        .map((device) => ({ name: device.name, id: device.id }));
+      return Promise.resolve(devices);
     });
 
     cb();

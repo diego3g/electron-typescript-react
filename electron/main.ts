@@ -5,7 +5,7 @@ import installExtension, {
   REACT_DEVELOPER_TOOLS,
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer';
-import { asyncSetupMainListener } from './core/mainBotListener';
+import { asyncSetupMainListener } from './core/mainListener';
 
 let mainWindow: Electron.BrowserWindow | null;
 

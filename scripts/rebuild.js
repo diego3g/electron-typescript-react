@@ -60,7 +60,7 @@ rebuild
   .rebuild({
     buildPath: path.resolve(__dirname, '..'),
     force: true,
-    onlyModules: '@discordjs/opus',
+    onlyModules: ['@discordjs/opus', 'naudiodon', 'segfault-handler'],
     electronVersion: '10.1.1', // hard-coding this for now
   })
   .then(() => {
