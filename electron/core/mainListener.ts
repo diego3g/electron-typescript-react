@@ -15,7 +15,10 @@ import fs from 'fs';
 import path from 'path';
 import { BotWrapper } from './botWrapper';
 import portAudio from 'naudiodon';
-import { createDeviceBroadcastStream } from './deviceBroadcastStream';
+import {
+  createAudioDevice,
+  createDeviceBroadcast,
+} from './deviceBroadcastStream';
 
 type VoiceChannelInfo = {
   id: string;
@@ -36,9 +39,15 @@ export function setupMainListener(cb: () => void): void {
 
   client.on('ready', () => {
     const bot = new BotWrapper(client);
-
-    // let broadcastDevice: Device | null = null;
+    /**
+     * @TODO This is mutable data that needs to be available for
+     * all of these handlers. It feels kind of gross and brittle,
+     * but I'm not sure of a better way to handle this at the moment
+     *
+     * ~reccanti 9/7/2020
+     */
     let broadcastStream: VoiceBroadcast | null = null;
+    let currentSample = 0;
 
     ipcMain.handle('get-joined-servers', () =>
       Promise.resolve(
@@ -116,7 +125,17 @@ export function setupMainListener(cb: () => void): void {
         .getDevices()
         .find((device) => device.id === deviceInfo.id);
       if (device) {
-        broadcastStream = createDeviceBroadcastStream(client, device);
+        /**
+         * Before we connect our audio device to the broadcast
+         * stream, create a "data" listener that sends a sample of
+         * audio data to the frontend. We'll use this for visualizations
+         * that will let the user know the bot is listening
+         */
+        const deviceStream = createAudioDevice(device);
+        deviceStream.on('data', (buf: Buffer) => {
+          currentSample = buf.toJSON().data[0];
+        });
+        broadcastStream = createDeviceBroadcast(client, deviceStream);
         bot.getActiveVoiceChannels().forEach((channel) => {
           // casting here because we just set broadcastStream as a value above
           bot.play(channel, broadcastStream as VoiceBroadcast);
@@ -128,6 +147,10 @@ export function setupMainListener(cb: () => void): void {
       bot.getActiveVoiceChannels().forEach((channel) => {
         bot.silence(channel);
       });
+    });
+
+    ipcMain.handle('get-sample', () => {
+      return Promise.resolve(currentSample);
     });
 
     cb();

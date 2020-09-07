@@ -98,22 +98,17 @@ declare module 'naudiodon' {
     outOptions: AudioOptions;
   }
 
+  type Options = ReadableOptions | WritableOptions | DuplexOptions;
+
+  export type ReadableAudioStream = Readable & AudioStream;
+  export type WritableAudioStream = Writable & AudioStream;
+  export type DuplexAudioStream = Duplex & AudioStream;
+
   export const AudioIO: {
-    new (options: ReadableOptions): Readable & AudioStream;
-    new (options: WritableOptions): Writable & AudioStream;
-    new (options: DuplexOptions): Duplex & AudioStream;
+    new <T extends Options>(options: T): T extends ReadableOptions
+      ? ReadableAudioStream
+      : T extends WritableOptions
+      ? WritableAudioStream
+      : DuplexAudioStream;
   };
-
-  //   export function AudioIO(options: {
-  //     inOptions: AudioOptions;
-  //   }): Readable & AudioStream;
-
-  //   export function AudioIO(options: {
-  //     outOptions: AudioOptions;
-  //   }): Writable & AudioStream;
-
-  //   export function AudioIO(options: {
-  //     inOptions: AudioOptions;
-  //     outOptions: AudioOptions;
-  //   }): Duplex & AudioStream;
 }

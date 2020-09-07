@@ -1,6 +1,7 @@
 /**
  * Hooks for interacting with portAudio
  */
+import { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import { useStateMemoArray } from './useStateMemoArray';
 
@@ -26,4 +27,24 @@ export function startBroadcast(device: DeviceInfo) {
 
 export function stopBroadcast() {
   ipcRenderer.invoke('stop-broadcast');
+}
+
+async function getSample() {
+  return await ipcRenderer.invoke('get-sample');
+}
+
+/**
+ * Periodically fetches a new sample
+ */
+export function useSample() {
+  const [sample, setSample] = useState(0);
+  useEffect(() => {
+    const id = setInterval(async () => {
+      const sample = await getSample();
+      setSample(sample);
+    }, 200);
+    return () => clearInterval(sample);
+  });
+
+  return sample;
 }
