@@ -1,10 +1,10 @@
-const path = require('path')
+const path = require('path');
 
-const rootPath = path.resolve(__dirname, '..')
+const rootPath = path.resolve(__dirname, '..');
 
 module.exports = {
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
   },
   devtool: 'source-map',
   entry: path.resolve(rootPath, 'electron', 'main.ts'),
@@ -15,16 +15,16 @@ module.exports = {
         test: /\.(js|ts|tsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
-        }
-      }
-    ]
+          loader: 'babel-loader',
+        },
+      },
+    ],
   },
   node: {
-    __dirname: false
+    __dirname: false,
   },
   output: {
     path: path.resolve(rootPath, 'dist'),
-    filename: '[name].js'
-  }
-}
+    filename: '[name].js',
+  },
+};

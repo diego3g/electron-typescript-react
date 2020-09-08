@@ -2,29 +2,34 @@
   "name": "electron-react-typescript",
   "version": "1.0.0",
   "description": "An Electron boilerplate including TypeScript, React, Jest and ESLint.",
-  "main": "./dist/main.js",
+  "main": "dist-server/main.js",
   "scripts": {
     "dev": "npm-run-all -p dev:react electron:serve",
-    "dev:electron": "cross-env NODE_ENV=development webpack --config webpack/electron.webpack.js --mode development && npm run start:electron",
+    "dev:electron": "tsc --project ./tsconfig.server.json && NODE_ENV=development npm run start:electron",
     "dev:react": "cross-env NODE_ENV=development webpack-dev-server --config webpack/react.webpack.js --mode development",
     "electron:serve": "wait-on http-get://localhost:4000/ && npm run dev:electron",
     "start:electron": "electron .",
     "build": "npm-run-all build:electron build:react",
     "build:run": "npm-run-all build start:electron",
-    "build:electron": "webpack --config webpack/electron.webpack.js",
+    "build:electron": "tsc --project ./tsconfig.server.json",
     "build:react": "webpack --config webpack/react.webpack.js",
     "package": "npm-run-all build package:dist",
     "package:dist": "electron-builder --dir",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint .",
+    "postinstall": "electron-rebuild -f"
   },
   "keywords": [],
   "author": "Diego Fernandes <diego.schell.f@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.9.4",
     "@babel/preset-typescript": "^7.9.0",
+    "@babel/runtime": "^7.11.2",
     "@commitlint/cli": "^9.0.1",
     "@commitlint/config-conventional": "^10.0.0",
     "@commitlint/core": "^9.0.1",
@@ -35,15 +40,16 @@
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "@types/styled-components": "^5.1.0",
+    "@types/ws": "^7.2.6",
     "@typescript-eslint/eslint-plugin": "^3.4.0",
     "@typescript-eslint/parser": "^3.4.0",
     "babel-loader": "^8.1.0",
     "commitizen": "^4.2.1",
     "cross-env": "^7.0.2",
     "cz-conventional-changelog": "3.2.0",
-    "electron": "^8.2.2",
     "electron-builder": "^22.7.0",
     "electron-devtools-installer": "^3.1.1",
+    "electron-rebuild": "^2.0.1",
     "eslint": "^7.3.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
@@ -65,15 +71,23 @@
     "wait-on": "^5.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.10.3",
+    "electron": "^10.1.1"
   },
   "dependencies": {
+    "electron-devtools-installer": "^3.1.1",
+    "@material-ui/core": "^4.11.0",
+    "discord.js": "^12.3.1",
+    "encoding": "^0.1.13",
+    "ffmpeg-static": "^4.2.7",
+    "naudiodon": "^2.2.4",
+    "opusscript": "0.0.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1"
   },
   "build": {
-    "appId": "your.id",
+    "appId": "com.electron.loudred",
     "mac": {
       "category": "public.app-category.video"
     },
@@ -82,7 +96,8 @@
     },
     "files": [
       "package.json",
-      "dist/**"
+      "dist-server/**",
+      "dist-renderer/**"
     ]
   },
   "config": {

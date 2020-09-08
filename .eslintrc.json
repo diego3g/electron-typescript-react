@@ -6,7 +6,6 @@
     "jest": true
   },
   "extends": [
-    "standard",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier/@typescript-eslint"
@@ -19,11 +18,7 @@
     "ecmaVersion": 11,
     "sourceType": "module"
   },
-  "plugins": [
-    "react",
-    "prettier",
-    "@typescript-eslint"
-  ],
+  "plugins": ["import", "react", "prettier", "@typescript-eslint"],
   "rules": {
     "react/prop-types": "off",
     "import/extensions": [
@@ -36,8 +31,11 @@
     ]
   },
   "settings": {
+    "react": {
+      "version": "detect"
+    },
     "import/resolver": {
-      "typescript": {} 
+      "typescript": {}
     }
   }
 }
