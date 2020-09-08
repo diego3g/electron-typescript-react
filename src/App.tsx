@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from 'react-dom';
-// import { ProfileInfo } from './sections/ProfileInfo';
 import {
   ServerSelect,
   ChannelList,
@@ -14,12 +13,7 @@ import {
   StartButton,
   StopButton,
 } from './sections/DeviceSelect/index';
-import {
-  CssBaseline,
-  Box,
-  BottomNavigation,
-  BottomNavigationAction,
-} from '@material-ui/core';
+import { CssBaseline, Box } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 /**

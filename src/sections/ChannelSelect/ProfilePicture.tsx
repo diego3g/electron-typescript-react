@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { ChannelSelectContext } from './ChannelSelectContext';
 import { useSample } from '../../hooks/portAudioHooks';
-import { Avatar, makeStyles } from '@material-ui/core';
+import { Avatar, makeStyles, Box } from '@material-ui/core';
 
 const hexToRGB = (hex: string) => {
   const digits = hex.replace('#', '');
@@ -11,27 +11,46 @@ const hexToRGB = (hex: string) => {
   return { r, g, b };
 };
 
-const useStyles = makeStyles((theme) => {
+const useActivityRingStyles = makeStyles((theme) => {
   const { r, g, b } = hexToRGB(theme.palette.secondary.dark);
   return {
-    image: (props: { opacity: number }) => ({
-      height: theme.spacing(16),
-      width: theme.spacing(16),
+    activity: (props: { opacity: number }) => ({
       borderRadius: '50%',
       border: `8px solid rgba(${r}, ${g}, ${b}, ${props.opacity})`,
       transition: `border 0.2s ease`,
+      width: theme.spacing(18),
+      height: theme.spacing(18),
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     }),
   };
 });
 
+const useImageStyles = makeStyles((theme) => {
+  return {
+    image: {
+      height: theme.spacing(14),
+      width: theme.spacing(14),
+    },
+  };
+});
+
+const ActivityRing: React.FC = ({ children }) => {
+  const sample = useSample();
+  const classes = useActivityRingStyles({ opacity: sample / 255 });
+  return <Box className={classes.activity}>{children}</Box>;
+};
+
 export const ProfilePicture: React.FC = () => {
   const { botAvatarUrl } = useContext(ChannelSelectContext);
-  const sample = useSample();
-  const classes = useStyles({ opacity: sample / 255 });
+  const classes = useImageStyles();
   return (
-    <Avatar
-      className={classes.image}
-      src={(botAvatarUrl && botAvatarUrl) || undefined}
-    />
+    <ActivityRing>
+      <Avatar
+        className={classes.image}
+        src={(botAvatarUrl && botAvatarUrl) || undefined}
+      />
+    </ActivityRing>
   );
 };
