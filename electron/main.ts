@@ -38,7 +38,7 @@ function createWindow() {
 
 app
   .on('ready', async () => {
-    await asyncSetupMainListener();
+    await asyncSetupMainListener(app);
     createWindow();
   })
   .whenReady()

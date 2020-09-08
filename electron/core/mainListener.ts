@@ -7,14 +7,22 @@
  *
  * @TODO We may want to work on expanding this eventually
  * to cover more than just "bot" messages
+ *
+ * @TODO Once the user's started a device stream, I can't
+ * seem to exit this process without causing a segfault.
+ * I'm not sure why this is. It might just be because electron
+ * is buggy with these packages? If that's the case, maybe the
+ * solution is to run it from a child process? Would that defeat
+ * the purpose of running this in electron to begin with?
+ * ~reccanti 9/7/2020
  */
 
 import { Client, VoiceBroadcast } from 'discord.js';
-import { ipcMain } from 'electron';
+import { App, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { BotWrapper } from './botWrapper';
-import portAudio from 'naudiodon';
+import portAudio, { ReadableAudioStream } from 'naudiodon';
 import {
   createAudioDevice,
   createDeviceBroadcast,
@@ -31,7 +39,7 @@ type DeviceInfo = {
   name: string;
 };
 
-export function setupMainListener(cb: () => void): void {
+export function setupMainListener(app: App, cb: () => void): void {
   /**
    * Initialize the Discord client and bot wrapper
    */
@@ -47,7 +55,23 @@ export function setupMainListener(cb: () => void): void {
      * ~reccanti 9/7/2020
      */
     let broadcastStream: VoiceBroadcast | null = null;
+    let deviceStream: ReadableAudioStream | null = null;
     let currentSample = 0;
+
+    function cleanupStreams(): Promise<void> {
+      return new Promise((resolve) => {
+        if (broadcastStream) {
+          broadcastStream.end();
+          broadcastStream = null;
+        }
+        if (deviceStream) {
+          deviceStream.quit(() => {
+            deviceStream = null;
+            resolve();
+          });
+        }
+      });
+    }
 
     ipcMain.handle('get-joined-servers', () =>
       Promise.resolve(
@@ -131,7 +155,7 @@ export function setupMainListener(cb: () => void): void {
          * audio data to the frontend. We'll use this for visualizations
          * that will let the user know the bot is listening
          */
-        const deviceStream = createAudioDevice(device);
+        deviceStream = createAudioDevice(device);
         deviceStream.on('data', (buf: Buffer) => {
           currentSample = buf.toJSON().data[0];
         });
@@ -143,14 +167,28 @@ export function setupMainListener(cb: () => void): void {
       }
     });
 
-    ipcMain.handle('stop-broadcast', () => {
+    ipcMain.handle('stop-broadcast', async () => {
       bot.getActiveVoiceChannels().forEach((channel) => {
         bot.silence(channel);
       });
+      await cleanupStreams();
+      console.log('streams stopped');
     });
 
     ipcMain.handle('get-sample', () => {
       return Promise.resolve(currentSample);
+    });
+
+    app.on('before-quit', async (e) => {
+      if (deviceStream || broadcastStream) {
+        e.preventDefault();
+        console.log('cleaning up streams');
+        await cleanupStreams();
+        console.log("let's quit now");
+        app.quit();
+      } else {
+        console.log('quitting for real');
+      }
     });
 
     cb();
@@ -159,8 +197,8 @@ export function setupMainListener(cb: () => void): void {
   client.login(process.env.DISCORD_BOT_TOKEN);
 }
 
-export function asyncSetupMainListener(): Promise<void> {
+export function asyncSetupMainListener(app: App): Promise<void> {
   return new Promise((resolve) => {
-    setupMainListener(resolve);
+    setupMainListener(app, resolve);
   });
 }

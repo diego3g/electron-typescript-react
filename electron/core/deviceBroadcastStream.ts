@@ -35,6 +35,16 @@ export function createAudioDevice(device: Device): ReadableAudioStream {
     },
   });
 
+  ai.on('error', (err) => {
+    console.log('error');
+    console.log(err);
+  });
+
+  ai.on('end', () => {
+    console.log('destroying');
+    // ai.destroy();
+  });
+
   return ai;
 }
 
