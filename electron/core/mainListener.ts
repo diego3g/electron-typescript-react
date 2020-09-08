@@ -179,6 +179,14 @@ export function setupMainListener(app: App, cb: () => void): void {
       return Promise.resolve(currentSample);
     });
 
+    ipcMain.handle('get-bot-name', () => {
+      return Promise.resolve(bot.name);
+    });
+
+    ipcMain.handle('get-bot-url', () => {
+      return Promise.resolve(bot.getAvatarUrl());
+    });
+
     app.on('before-quit', async (e) => {
       if (deviceStream || broadcastStream) {
         e.preventDefault();

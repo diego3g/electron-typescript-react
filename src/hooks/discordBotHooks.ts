@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ipcRenderer } from 'electron';
 import { useStateMemoArray } from './useStateMemoArray';
 
@@ -65,4 +66,28 @@ export function useActiveVoiceChannels(): {
     joinChannel,
     leaveChannel,
   };
+}
+
+export function useBotName() {
+  const [botName, setBotName] = useState<string | null>(null);
+  ipcRenderer.invoke('get-bot-name').then((name) => {
+    if (name) {
+      setBotName(name);
+    } else {
+      setBotName(null);
+    }
+  });
+  return botName;
+}
+
+export function useBotAvatarUrl() {
+  const [botAvatarUrl, setBotAvatarUrl] = useState<string | null>(null);
+  ipcRenderer.invoke('get-bot-url').then((url) => {
+    if (url) {
+      setBotAvatarUrl(url);
+    } else {
+      setBotAvatarUrl(null);
+    }
+  });
+  return botAvatarUrl;
 }

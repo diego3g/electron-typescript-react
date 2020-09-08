@@ -9,6 +9,8 @@ import {
   useJoinedServers,
   useActiveVoiceChannels,
   useVoiceChannelsInServer,
+  useBotAvatarUrl,
+  useBotName,
 } from '../../hooks/discordBotHooks';
 
 type ChannelSelectContextType = {
@@ -19,6 +21,8 @@ type ChannelSelectContextType = {
   activeVoiceChannels: VoiceChannelInfo[];
   joinChannel: (channel: VoiceChannelInfo) => void;
   leaveChannel: (channel: VoiceChannelInfo) => void;
+  botName: string | null;
+  botAvatarUrl: string | null;
 };
 
 const initialState: ChannelSelectContextType = {
@@ -35,6 +39,8 @@ const initialState: ChannelSelectContextType = {
   leaveChannel() {
     console.log("leaveChannel() hasn't been initialized yet");
   },
+  botName: null,
+  botAvatarUrl: null,
 };
 
 export const ChannelSelectContext = createContext<ChannelSelectContextType>(
@@ -52,6 +58,8 @@ export const ChannelSelectProvider: React.FC = ({ children }) => {
     joinChannel,
     leaveChannel,
   } = useActiveVoiceChannels();
+  const botName = useBotName();
+  const botAvatarUrl = useBotAvatarUrl();
 
   const value = {
     servers,
@@ -61,6 +69,8 @@ export const ChannelSelectProvider: React.FC = ({ children }) => {
     activeVoiceChannels,
     joinChannel,
     leaveChannel,
+    botName,
+    botAvatarUrl,
   };
 
   return (

@@ -5,6 +5,8 @@ import {
   ServerSelect,
   ChannelList,
   ChannelSelectProvider,
+  ProfilePicture,
+  ProfileName,
 } from './sections/ChannelSelect/index';
 import {
   DeviceSelect,
@@ -29,7 +31,7 @@ document.body.appendChild(mainElement);
 
 const style = document.createElement('style');
 style.innerHTML = `
-html {
+html, body, #root {
   -webkit-app-region: drag;
   height: 100%;
 }`;
@@ -63,13 +65,36 @@ const App = () => {
       <DeviceSelectProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Box p={theme.spacing(1)}>
-            {/* <ProfileInfo /> */}
-            <ServerSelect />
-            <ChannelList />
+          <Box
+            p={theme.spacing(1)}
+            display="flex"
+            flexDirection="column"
+            height="100%"
+          >
+            <Box
+              display="flex"
+              position="relative"
+              alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+            >
+              <ProfilePicture />
+              <ProfileName />
+            </Box>
             <DeviceSelect />
-            <StartButton />
-            <StopButton />
+            <Box flexGrow={1}>
+              <ServerSelect />
+              <ChannelList />
+            </Box>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              justifySelf="flex-end"
+            >
+              <StartButton />
+              <StopButton />
+            </Box>
           </Box>
         </ThemeProvider>
       </DeviceSelectProvider>
