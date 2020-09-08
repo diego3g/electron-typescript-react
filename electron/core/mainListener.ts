@@ -122,9 +122,13 @@ export function setupMainListener(app: App, cb: () => void): void {
           path.resolve(__dirname, '../../assets/loudred-cry.webm')
         );
         await bot.join(channel);
-        await bot.play(channel, loudredCry, { type: 'webm/opus' }, () => {
-          bot.silence(channel);
-        });
+        if (broadcastStream) {
+          await bot.play(channel, broadcastStream);
+        } else {
+          await bot.play(channel, loudredCry, { type: 'webm/opus' }, () => {
+            bot.silence(channel);
+          });
+        }
       }
     );
 
@@ -190,19 +194,19 @@ export function setupMainListener(app: App, cb: () => void): void {
     app.on('before-quit', async (e) => {
       if (deviceStream || broadcastStream) {
         e.preventDefault();
-        console.log('cleaning up streams');
         await cleanupStreams();
-        console.log("let's quit now");
         app.quit();
-      } else {
-        console.log('quitting for real');
       }
     });
 
     cb();
   });
 
-  client.login(process.env.DISCORD_BOT_TOKEN);
+  client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
+    console.log('unable to log into application');
+    console.log(err);
+    cb();
+  });
 }
 
 export function asyncSetupMainListener(app: App): Promise<void> {

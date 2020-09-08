@@ -5,13 +5,14 @@ import installExtension, {
   REACT_DEVELOPER_TOOLS,
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer';
+
 import { asyncSetupMainListener } from './core/mainListener';
 
 let mainWindow: Electron.BrowserWindow | null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 600,
+    width: 400,
     height: 800,
     webPreferences: {
       nodeIntegration: true,
