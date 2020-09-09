@@ -13,6 +13,7 @@ import {
   StartButton,
   StopButton,
 } from './sections/DeviceSelect/index';
+import { SettingsModal } from './sections/Settings';
 import { CssBaseline, Box } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
@@ -65,6 +66,9 @@ const App = () => {
             flexDirection="column"
             height="100%"
           >
+            <Box display="flex" justifyContent="flex-end">
+              <SettingsModal />
+            </Box>
             <Box
               display="flex"
               position="relative"
