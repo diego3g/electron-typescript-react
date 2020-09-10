@@ -98,7 +98,8 @@
     "files": [
       "package.json",
       "dist-server/**",
-      "dist-renderer/**"
+      "dist-renderer/**",
+      "assets/**"
     ]
   },
   "config": {
