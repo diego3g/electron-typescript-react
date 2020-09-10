@@ -27,6 +27,7 @@ import {
   createAudioDevice,
   createDeviceBroadcast,
 } from './deviceBroadcastStream';
+import { getToken, setToken } from './credentials';
 
 type VoiceChannelInfo = {
   id: string;
@@ -45,9 +46,25 @@ export function setupMainListener(app: App, cb: () => void): void {
    */
   const client = new Client();
 
-  client.on('ready', () => {
-    console.log('asdfasdfadfasdfa');
+  function login(token: string) {
+    return client
+      .login(token)
+      .then(() => true)
+      .catch((err) => {
+        console.log('unable to log into application');
+        console.log(err);
+        return false;
+      });
+  }
 
+  getToken().then(async (token) => {
+    if (token) {
+      await login(token);
+    }
+    cb();
+  });
+
+  client.on('ready', () => {
     const bot = new BotWrapper(client);
     /**
      * @TODO This is mutable data that needs to be available for
@@ -204,25 +221,14 @@ export function setupMainListener(app: App, cb: () => void): void {
     });
   });
 
-  ipcMain.handle('login', (_e, token: string) => {
-    // client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
-
-    console.log(token);
-    return client
-      .login(token)
-      .then(() => true)
-      .catch((err) => {
-        console.log('unable to log into application');
-        console.log(err);
-        return false;
-      });
+  ipcMain.handle('login', async (_e, token: string) => {
+    await setToken(token);
+    return await login(token);
   });
 
   ipcMain.handle('is-logged-in', () => {
     return Promise.resolve(!!client.user);
   });
-
-  cb();
 }
 
 export function asyncSetupMainListener(app: App): Promise<void> {
