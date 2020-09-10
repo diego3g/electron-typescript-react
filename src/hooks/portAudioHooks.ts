@@ -1,9 +1,10 @@
 /**
  * Hooks for interacting with portAudio
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { ipcRenderer } from 'electron';
 import { useStateMemoArray } from './useStateMemoArray';
+import { BotContext } from '../sections/BotContext';
 
 export type DeviceInfo = {
   id: number;
@@ -38,13 +39,16 @@ async function getSample() {
  */
 export function useSample() {
   const [sample, setSample] = useState(0);
+  const { isLoggedIn } = useContext(BotContext);
   useEffect(() => {
-    const id = setInterval(async () => {
-      const sample = await getSample();
-      setSample(sample);
-    }, 200);
-    return () => clearInterval(sample);
-  });
+    if (isLoggedIn) {
+      const id = setInterval(async () => {
+        const sample = await getSample();
+        setSample(sample);
+      }, 200);
+      return () => clearInterval(sample);
+    }
+  }, [isLoggedIn]);
 
   return sample;
 }

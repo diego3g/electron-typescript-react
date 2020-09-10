@@ -2,8 +2,8 @@
  * Context that manages state for the DeviceSelect
  * component.
  */
-import React, { createContext, useState } from 'react';
-import { DeviceInfo, useDevices } from '../../hooks/portAudioHooks';
+import React, { createContext, useState, useContext } from 'react';
+import { DeviceInfo, PortAudioContext } from '../../sections/PortAudioContext';
 
 type ContextType = {
   devices: DeviceInfo[];
@@ -22,7 +22,7 @@ const initialState: ContextType = {
 export const DeviceSelectContext = createContext<ContextType>(initialState);
 
 export const DeviceSelectProvider: React.FC = ({ children }) => {
-  const devices = useDevices();
+  const { devices } = useContext(PortAudioContext);
   const [currentDevice, setCurrentDevice] = useState<DeviceInfo | null>(null);
 
   const value = {

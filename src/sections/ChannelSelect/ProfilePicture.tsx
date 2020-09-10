@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { ChannelSelectContext } from './ChannelSelectContext';
-import { useSample } from '../../hooks/portAudioHooks';
+import { BotContext } from '../BotContext';
+import { PortAudioContext } from '../PortAudioContext';
 import { Avatar, makeStyles, Box } from '@material-ui/core';
 
 const hexToRGB = (hex: string) => {
@@ -37,20 +37,17 @@ const useImageStyles = makeStyles((theme) => {
 });
 
 const ActivityRing: React.FC = ({ children }) => {
-  const sample = useSample();
+  const { sample } = useContext(PortAudioContext);
   const classes = useActivityRingStyles({ opacity: sample / 255 });
   return <Box className={classes.activity}>{children}</Box>;
 };
 
 export const ProfilePicture: React.FC = () => {
-  const { botAvatarUrl } = useContext(ChannelSelectContext);
+  const { avatarUrl } = useContext(BotContext);
   const classes = useImageStyles();
   return (
     <ActivityRing>
-      <Avatar
-        className={classes.image}
-        src={(botAvatarUrl && botAvatarUrl) || undefined}
-      />
+      <Avatar className={classes.image} src={avatarUrl || undefined} />
     </ActivityRing>
   );
 };

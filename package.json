@@ -75,9 +75,10 @@
     "electron": "^10.1.1"
   },
   "dependencies": {
-    "electron-devtools-installer": "^3.1.1",
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "discord.js": "^12.3.1",
+    "electron-devtools-installer": "^3.1.1",
     "encoding": "^0.1.13",
     "ffmpeg-static": "^4.2.7",
     "naudiodon": "^2.2.4",

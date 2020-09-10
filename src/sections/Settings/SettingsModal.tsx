@@ -8,7 +8,7 @@
  *
  * ~reccanti 9/9/2020
  */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   IconButton,
   Modal,
@@ -18,6 +18,7 @@ import {
   TextField,
 } from '@material-ui/core';
 import { Settings, ArrowBack } from '@material-ui/icons';
+import { BotContext } from '../BotContext';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -37,10 +38,21 @@ const useStyles = makeStyles((theme) => {
 
 export const SettingsModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [token, setToken] = useState<string>('');
   const classes = useStyles();
+  const { login } = useContext(BotContext);
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
+
+  const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const token = e.target.value;
+    setToken(token);
+  };
+
+  const handleSaveChanges = () => {
+    login(token);
+  };
 
   return (
     <>
@@ -58,11 +70,19 @@ export const SettingsModal: React.FC = () => {
           </Box>
           {/* Settings */}
           <Box flex={1}>
-            <TextField label="Discord Client Token" fullWidth type="password" />
+            <TextField
+              value={token}
+              label="Discord Client Token"
+              fullWidth
+              type="password"
+              onChange={handleTokenChange}
+            />
           </Box>
           {/* Bottom Bar */}
           <Box>
-            <Button variant="contained">Save</Button>
+            <Button onClick={handleSaveChanges} variant="contained">
+              Save
+            </Button>
           </Box>
         </Box>
       </Modal>

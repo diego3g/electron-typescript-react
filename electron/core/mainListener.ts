@@ -46,6 +46,8 @@ export function setupMainListener(app: App, cb: () => void): void {
   const client = new Client();
 
   client.on('ready', () => {
+    console.log('asdfasdfadfasdfa');
+
     const bot = new BotWrapper(client);
     /**
      * @TODO This is mutable data that needs to be available for
@@ -129,6 +131,7 @@ export function setupMainListener(app: App, cb: () => void): void {
             bot.silence(channel);
           });
         }
+        return Promise.resolve();
       }
     );
 
@@ -139,6 +142,7 @@ export function setupMainListener(app: App, cb: () => void): void {
       if (!channel) return;
 
       bot.leave(channel);
+      return Promise.resolve();
     });
 
     ipcMain.handle('get-devices', () => {
@@ -198,15 +202,27 @@ export function setupMainListener(app: App, cb: () => void): void {
         app.quit();
       }
     });
-
-    cb();
   });
 
-  client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
-    console.log('unable to log into application');
-    console.log(err);
-    cb();
+  ipcMain.handle('login', (_e, token: string) => {
+    // client.login(process.env.DISCORD_BOT_TOKEN).catch((err) => {
+
+    console.log(token);
+    return client
+      .login(token)
+      .then(() => true)
+      .catch((err) => {
+        console.log('unable to log into application');
+        console.log(err);
+        return false;
+      });
   });
+
+  ipcMain.handle('is-logged-in', () => {
+    return Promise.resolve(!!client.user);
+  });
+
+  cb();
 }
 
 export function asyncSetupMainListener(app: App): Promise<void> {

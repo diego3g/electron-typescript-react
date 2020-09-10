@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { ChannelSelectContext } from './ChannelSelectContext';
+import { BotContext } from '../../sections/BotContext';
 
 export const ProfileName: React.FC = () => {
-  const { botName } = useContext(ChannelSelectContext);
-  return <h1>{botName}</h1>;
+  const { name } = useContext(BotContext);
+  return <h1>{name}</h1>;
 };
