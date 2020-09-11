@@ -10,11 +10,21 @@ export type DeviceInfo = {
 type ContextType = {
   devices: DeviceInfo[];
   sample: number;
+  startBroadcast: (device: DeviceInfo) => Promise<void>;
+  stopBroadcast: () => Promise<void>;
 };
 
 export const PortAudioContext = createContext<ContextType>({
   devices: [],
   sample: 0,
+  startBroadcast() {
+    console.log('"startBroadcast()" not implemented yet');
+    return Promise.resolve();
+  },
+  stopBroadcast() {
+    console.log('"stopBroadcast()" not implemented yet');
+    return Promise.resolve();
+  },
 });
 
 export const PortAudioProvider: React.FC = ({ children }) => {
@@ -29,23 +39,33 @@ export const PortAudioProvider: React.FC = ({ children }) => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    let duration = 0;
-    const id = requestAnimationFrame((delta) => {
-      if (duration > 1000) {
-        duration = 0;
-        ipcRenderer.invoke('get-sample').then((sample) => {
+    let prev = 0;
+    async function listen() {
+      requestAnimationFrame(async (cur) => {
+        if (cur - prev > 500) {
+          prev = cur;
+          const sample = await ipcRenderer.invoke('get-sample');
           setSample(sample);
-        });
-      } else {
-        duration += delta;
-      }
-    });
-    return () => cancelAnimationFrame(id);
+        }
+        listen();
+      });
+    }
+    listen();
   }, [isLoggedIn]);
+
+  const startBroadcast = async (device: DeviceInfo) => {
+    await ipcRenderer.invoke('start-broadcast', device);
+  };
+
+  const stopBroadcast = async () => {
+    await ipcRenderer.invoke('stop-broadcast');
+  };
 
   const value = {
     devices,
     sample,
+    startBroadcast,
+    stopBroadcast,
   };
 
   return (

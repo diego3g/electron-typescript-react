@@ -7,7 +7,7 @@
 
 import React, { useContext } from 'react';
 import { InputLabel, NativeSelect, FormControl } from '@material-ui/core';
-import { DeviceInfo } from '../../hooks/portAudioHooks';
+import { DeviceInfo } from '../PortAudioContext';
 import { DeviceSelectContext } from './DeviceSelectContext';
 
 const makeLookup = (device: DeviceInfo) => `${device.id}_${device.name}`;

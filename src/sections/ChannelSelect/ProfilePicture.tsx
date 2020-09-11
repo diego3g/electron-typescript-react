@@ -17,7 +17,7 @@ const useActivityRingStyles = makeStyles((theme) => {
     activity: (props: { opacity: number }) => ({
       borderRadius: '50%',
       border: `8px solid rgba(${r}, ${g}, ${b}, ${props.opacity})`,
-      transition: `border 0.2s ease`,
+      transition: `border 0.5s ease`,
       width: theme.spacing(18),
       height: theme.spacing(18),
       display: 'flex',
