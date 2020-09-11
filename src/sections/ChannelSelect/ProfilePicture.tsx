@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { ChannelSelectContext } from './ChannelSelectContext';
-import { useSample } from '../../hooks/portAudioHooks';
+import { BotContext } from '../BotContext';
+import { PortAudioContext } from '../PortAudioContext';
 import { Avatar, makeStyles, Box } from '@material-ui/core';
 
 const hexToRGB = (hex: string) => {
@@ -17,7 +17,7 @@ const useActivityRingStyles = makeStyles((theme) => {
     activity: (props: { opacity: number }) => ({
       borderRadius: '50%',
       border: `8px solid rgba(${r}, ${g}, ${b}, ${props.opacity})`,
-      transition: `border 0.2s ease`,
+      transition: `border 0.5s ease`,
       width: theme.spacing(18),
       height: theme.spacing(18),
       display: 'flex',
@@ -37,20 +37,17 @@ const useImageStyles = makeStyles((theme) => {
 });
 
 const ActivityRing: React.FC = ({ children }) => {
-  const sample = useSample();
+  const { sample } = useContext(PortAudioContext);
   const classes = useActivityRingStyles({ opacity: sample / 255 });
   return <Box className={classes.activity}>{children}</Box>;
 };
 
 export const ProfilePicture: React.FC = () => {
-  const { botAvatarUrl } = useContext(ChannelSelectContext);
+  const { avatarUrl } = useContext(BotContext);
   const classes = useImageStyles();
   return (
     <ActivityRing>
-      <Avatar
-        className={classes.image}
-        src={(botAvatarUrl && botAvatarUrl) || undefined}
-      />
+      <Avatar className={classes.image} src={avatarUrl || undefined} />
     </ActivityRing>
   );
 };

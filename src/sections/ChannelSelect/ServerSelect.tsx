@@ -1,12 +1,11 @@
 import React, { useContext, useMemo } from 'react';
 import { ChannelSelectContext } from './ChannelSelectContext';
-import { ServerInfo } from '../../hooks/discordBotHooks';
+import { BotContext, ServerInfo } from '../../sections/BotContext';
 import { InputLabel, NativeSelect, FormControl } from '@material-ui/core';
 
 export const ServerSelect: React.FC = () => {
-  const { currentServer, servers, setCurrentServer } = useContext(
-    ChannelSelectContext
-  );
+  const { servers } = useContext(BotContext);
+  const { currentServer, setCurrentServer } = useContext(ChannelSelectContext);
 
   const serverLookup = useMemo(() => {
     const lookup = new Map<string, ServerInfo>();

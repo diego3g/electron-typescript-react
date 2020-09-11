@@ -1,6 +1,6 @@
 {
-  "name": "electron-react-typescript",
-  "version": "1.0.0",
+  "name": "loudred-app",
+  "version": "1.1.0",
   "description": "An Electron boilerplate including TypeScript, React, Jest and ESLint.",
   "main": "dist-server/main.js",
   "scripts": {
@@ -47,6 +47,7 @@
     "commitizen": "^4.2.1",
     "cross-env": "^7.0.2",
     "cz-conventional-changelog": "3.2.0",
+    "electron": "^10.1.1",
     "electron-builder": "^22.7.0",
     "electron-devtools-installer": "^3.1.1",
     "electron-rebuild": "^2.0.1",
@@ -71,20 +72,21 @@
     "wait-on": "^5.0.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
-    "electron": "^10.1.1"
+    "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
-    "electron-devtools-installer": "^3.1.1",
     "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "discord.js": "^12.3.1",
+    "electron-devtools-installer": "^3.1.1",
     "encoding": "^0.1.13",
     "ffmpeg-static": "^4.2.7",
     "naudiodon": "^2.2.4",
     "opusscript": "0.0.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "keytar": "^6.0.1"
   },
   "build": {
     "appId": "com.electron.loudred",
@@ -97,7 +99,8 @@
     "files": [
       "package.json",
       "dist-server/**",
-      "dist-renderer/**"
+      "dist-renderer/**",
+      "assets/**"
     ]
   },
   "config": {

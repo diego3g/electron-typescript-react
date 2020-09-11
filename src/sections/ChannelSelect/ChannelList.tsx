@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { ChannelSelectContext } from './ChannelSelectContext';
-import { VoiceChannelInfo } from '../../hooks/discordBotHooks';
+import { VoiceChannelInfo, BotContext } from '../../sections/BotContext';
 import {
   List,
   ListItem,
@@ -10,20 +10,16 @@ import {
 } from '@material-ui/core';
 
 export const ChannelList: React.FC = () => {
-  const {
-    voiceChannels,
-    activeVoiceChannels,
-    joinChannel,
-    leaveChannel,
-  } = useContext(ChannelSelectContext);
+  const { voiceChannels } = useContext(ChannelSelectContext);
+  const { activeChannels, joinChannel, leaveChannel } = useContext(BotContext);
 
   const activeChannelLookup = useMemo(() => {
     const lookup = new Map<string, VoiceChannelInfo>();
-    activeVoiceChannels.forEach((channel) => {
+    activeChannels.forEach((channel) => {
       lookup.set(channel.id, channel);
     });
     return lookup;
-  }, [activeVoiceChannels]);
+  }, [activeChannels]);
 
   return (
     <List>
