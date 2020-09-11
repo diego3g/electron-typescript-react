@@ -30,6 +30,7 @@ type ContextType = {
   activeChannels: VoiceChannelInfo[];
   joinChannel: (channel: VoiceChannelInfo) => Promise<void>;
   leaveChannel: (channel: VoiceChannelInfo) => Promise<void>;
+  token: string;
 };
 
 export const BotContext = createContext<ContextType>({
@@ -50,6 +51,7 @@ export const BotContext = createContext<ContextType>({
     console.log('leaveChannel() not instantiated yet');
     return Promise.resolve();
   },
+  token: '',
 });
 
 export const BotProvider: React.FC = ({ children }) => {
@@ -58,6 +60,7 @@ export const BotProvider: React.FC = ({ children }) => {
   const [name, setName] = useState<string>('');
   const [servers, setServers] = useState<ServerInfo[]>([]);
   const [activeChannels, setActiveChannels] = useState<VoiceChannelInfo[]>([]);
+  const [token, setToken] = useState<string>('');
 
   useEffect(() => {
     Promise.all([
@@ -65,11 +68,15 @@ export const BotProvider: React.FC = ({ children }) => {
       ipcRenderer.invoke('get-bot-name'),
       ipcRenderer.invoke('get-joined-servers'),
       ipcRenderer.invoke('get-active-voice-channels'),
-    ]).then(([url, name, servers, activeChannels]) => {
+      ipcRenderer.invoke('get-token'),
+    ]).then(([url, name, servers, activeChannels, token]) => {
       setAvatarUrl(url);
       setName(name);
       setServers(servers);
       setActiveChannels(activeChannels);
+      if (token) {
+        setToken(token);
+      }
     });
   }, [isLoggedIn]);
 
@@ -103,6 +110,7 @@ export const BotProvider: React.FC = ({ children }) => {
     joinChannel,
     leaveChannel,
     activeChannels,
+    token,
   };
 
   return <BotContext.Provider value={value}>{children}</BotContext.Provider>;

@@ -229,6 +229,10 @@ export function setupMainListener(app: App, cb: () => void): void {
   ipcMain.handle('is-logged-in', () => {
     return Promise.resolve(!!client.user);
   });
+
+  ipcMain.handle('get-token', async () => {
+    return await getToken();
+  });
 }
 
 export function asyncSetupMainListener(app: App): Promise<void> {

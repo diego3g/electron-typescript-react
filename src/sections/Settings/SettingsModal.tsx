@@ -8,7 +8,7 @@
  *
  * ~reccanti 9/9/2020
  */
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   IconButton,
   Modal,
@@ -37,10 +37,18 @@ const useStyles = makeStyles((theme) => {
 });
 
 export const SettingsModal: React.FC = () => {
+  const { login, token: initialToken } = useContext(BotContext);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState<string>(initialToken);
   const classes = useStyles();
-  const { login } = useContext(BotContext);
+
+  /**
+   * If the initial token changes, update the token
+   * that we display in the token field
+   */
+  useEffect(() => {
+    setToken(initialToken);
+  }, [initialToken]);
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
