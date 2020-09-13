@@ -6,7 +6,7 @@ import installExtension, {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer';
 
-import { asyncSetupMainListener } from './core/mainListener';
+import { asyncSetupMainListener } from './main/mainListener';
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -25,7 +25,7 @@ function createWindow() {
   } else {
     mainWindow.loadURL(
       url.format({
-        pathname: path.resolve(__dirname, '../dist-renderer/index.html'),
+        pathname: path.resolve(__dirname, '../dist/renderer/index.html'),
         protocol: 'file:',
         slashes: true,
       })

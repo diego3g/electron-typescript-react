@@ -4,7 +4,7 @@
  */
 import React, { createContext, useState } from 'react';
 import { useVoiceChannelsInServer } from '../../hooks/discordBotHooks';
-import { ServerInfo, VoiceChannelInfo } from '../../sections/BotContext';
+import { ServerInfo, VoiceChannelInfo } from '../BotContext';
 
 type ChannelSelectContextType = {
   currentServer: ServerInfo | null;

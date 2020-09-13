@@ -2,7 +2,7 @@
   "name": "loudred-app",
   "version": "1.1.0",
   "description": "An Electron boilerplate including TypeScript, React, Jest and ESLint.",
-  "main": "dist-server/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "npm-run-all -p dev:react electron:serve",
     "dev:electron": "tsc --project ./tsconfig.server.json && NODE_ENV=development npm run start:electron",
@@ -98,8 +98,7 @@
     },
     "files": [
       "package.json",
-      "dist-server/**",
-      "dist-renderer/**",
+      "dist/**",
       "assets/**"
     ]
   },

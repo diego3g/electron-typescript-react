@@ -7,9 +7,10 @@
     "allowJs": true,
     "jsx": "react",
     "sourceMap": true,
-    "outDir": "./dist-server",
+    "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["electron/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/renderer/**/*"]
 }

@@ -4,3 +4,4 @@ packages
 dist-renderer
 dist-server
 .DS_STORE
+*.log

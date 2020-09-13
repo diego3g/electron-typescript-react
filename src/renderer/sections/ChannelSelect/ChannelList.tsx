@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { ChannelSelectContext } from './ChannelSelectContext';
-import { VoiceChannelInfo, BotContext } from '../../sections/BotContext';
+import { VoiceChannelInfo, BotContext } from '../BotContext';
 import {
   List,
   ListItem,
