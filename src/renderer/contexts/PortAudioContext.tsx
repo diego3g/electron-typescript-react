@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ipcRenderer } from 'electron';
-import { BotContext } from '../BotContext';
+import { BotContext } from './BotContext';
 
 export type DeviceInfo = {
   id: number;

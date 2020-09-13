@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
-import { ChannelSelectContext } from './ChannelSelectContext';
-import { BotContext, ServerInfo } from '../BotContext';
+import { ChannelSelectContext } from '../../contexts/ChannelSelectContext';
+import { BotContext, ServerInfo } from '../../contexts/BotContext';
 import { InputLabel, NativeSelect, FormControl } from '@material-ui/core';
 
 export const ServerSelect: React.FC = () => {

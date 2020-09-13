@@ -3,7 +3,7 @@
  * component.
  */
 import React, { createContext, useState, useContext } from 'react';
-import { DeviceInfo, PortAudioContext } from '../PortAudioContext';
+import { DeviceInfo, PortAudioContext } from './PortAudioContext';
 
 type ContextType = {
   devices: DeviceInfo[];

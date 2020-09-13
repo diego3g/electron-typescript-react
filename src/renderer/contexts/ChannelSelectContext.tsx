@@ -3,8 +3,8 @@
  * ChannelSelect component
  */
 import React, { createContext, useState } from 'react';
-import { useVoiceChannelsInServer } from '../../hooks/discordBotHooks';
-import { ServerInfo, VoiceChannelInfo } from '../BotContext';
+import { useVoiceChannelsInServer } from '../hooks/discordBotHooks';
+import { ServerInfo, VoiceChannelInfo } from './BotContext';
 
 type ChannelSelectContextType = {
   currentServer: ServerInfo | null;

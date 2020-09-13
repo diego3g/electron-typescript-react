@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { BotContext } from '../BotContext';
-import { PortAudioContext } from '../PortAudioContext';
+import { BotContext } from '../../contexts/BotContext';
+import { PortAudioContext } from '../../contexts/PortAudioContext';
 import { Avatar, makeStyles, Box } from '@material-ui/core';
 
 const hexToRGB = (hex: string) => {

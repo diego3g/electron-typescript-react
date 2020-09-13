@@ -18,7 +18,7 @@ import {
   TextField,
 } from '@material-ui/core';
 import { Settings, ArrowBack } from '@material-ui/icons';
-import { BotContext } from '../BotContext';
+import { BotContext } from '../../contexts/BotContext';
 
 const useStyles = makeStyles((theme) => {
   return {

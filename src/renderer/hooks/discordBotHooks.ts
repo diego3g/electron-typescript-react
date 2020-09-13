@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { useStateMemoArray } from './useStateMemoArray';
-import { VoiceChannelInfo } from '../sections/BotContext';
+import { VoiceChannelInfo } from '../contexts/BotContext';
 
 export function useVoiceChannelsInServer(serverId: string): VoiceChannelInfo[] {
   const [voiceChannels, setVoiceChannels] = useStateMemoArray<

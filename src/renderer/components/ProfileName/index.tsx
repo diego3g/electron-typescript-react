@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { BotContext } from '../BotContext';
+import { BotContext } from '../../contexts/BotContext';
 
 export const ProfileName: React.FC = () => {
   const { name } = useContext(BotContext);

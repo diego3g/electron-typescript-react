@@ -1,23 +1,25 @@
+// node_modules
 import React from 'react';
 import { render } from 'react-dom';
-import {
-  ServerSelect,
-  ChannelList,
-  ChannelSelectProvider,
-  ProfilePicture,
-  ProfileName,
-} from './sections/ChannelSelect/index';
-import {
-  DeviceSelect,
-  DeviceSelectProvider,
-  StartButton,
-  StopButton,
-} from './sections/DeviceSelect/index';
-import { BotProvider } from './sections/BotContext';
-import { SettingsModal } from './sections/Settings';
-import { CssBaseline, Box } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { PortAudioProvider } from './sections/PortAudioContext';
+import { CssBaseline, Box } from '@material-ui/core';
+
+// components
+import { ServerSelect } from './components/ServerSelect';
+import { ChannelList } from './components/ChannelList';
+import { ProfilePicture } from './components/ProfilePicture';
+import { ProfileName } from './components/ProfileName';
+import { DeviceSelect } from './components/DeviceSelect';
+import { StartButton } from './components/StartButton';
+import { StopButton } from './components/StopButton';
+import { SettingsModal } from './components/Settings';
+
+// contexts
+import { ChannelSelectProvider } from './contexts/ChannelSelectContext';
+import { DeviceSelectProvider } from './contexts/DeviceSelectContext';
+import { BotProvider } from './contexts/BotContext';
+import { PortAudioProvider } from './contexts/PortAudioContext';
+import { WebContentsProvider } from './contexts/WebContentsContext';
 
 /**
  * Setup the page by applying elements and style tags to hook into
@@ -58,51 +60,53 @@ const App = () => {
     },
   });
   return (
-    <BotProvider>
-      <PortAudioProvider>
-        <ChannelSelectProvider>
-          <DeviceSelectProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Box
-                p={theme.spacing(1)}
-                display="flex"
-                flexDirection="column"
-                height="100%"
-              >
-                <Box display="flex" justifyContent="flex-end">
-                  <SettingsModal />
-                </Box>
+    <WebContentsProvider>
+      <BotProvider>
+        <PortAudioProvider>
+          <ChannelSelectProvider>
+            <DeviceSelectProvider>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
                 <Box
+                  p={theme.spacing(1)}
                   display="flex"
-                  position="relative"
-                  alignItems="center"
-                  justifyContent="center"
                   flexDirection="column"
+                  height="100%"
                 >
-                  <ProfilePicture />
-                  <ProfileName />
+                  <Box display="flex" justifyContent="flex-end">
+                    <SettingsModal />
+                  </Box>
+                  <Box
+                    display="flex"
+                    position="relative"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexDirection="column"
+                  >
+                    <ProfilePicture />
+                    <ProfileName />
+                  </Box>
+                  <DeviceSelect />
+                  <Box flexGrow={1}>
+                    <ServerSelect />
+                    <ChannelList />
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    justifySelf="flex-end"
+                  >
+                    <StartButton />
+                    <StopButton />
+                  </Box>
                 </Box>
-                <DeviceSelect />
-                <Box flexGrow={1}>
-                  <ServerSelect />
-                  <ChannelList />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  justifySelf="flex-end"
-                >
-                  <StartButton />
-                  <StopButton />
-                </Box>
-              </Box>
-            </ThemeProvider>
-          </DeviceSelectProvider>
-        </ChannelSelectProvider>
-      </PortAudioProvider>
-    </BotProvider>
+              </ThemeProvider>
+            </DeviceSelectProvider>
+          </ChannelSelectProvider>
+        </PortAudioProvider>
+      </BotProvider>
+    </WebContentsProvider>
   );
 };
 
