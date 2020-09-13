@@ -63,6 +63,7 @@ export const BotProvider: React.FC = ({ children }) => {
   const [token, setToken] = useState<string>('');
 
   useEffect(() => {
+    // request data from the backend
     Promise.all([
       ipcRenderer.invoke('get-bot-url'),
       ipcRenderer.invoke('get-bot-name'),
@@ -70,12 +71,20 @@ export const BotProvider: React.FC = ({ children }) => {
       ipcRenderer.invoke('get-active-voice-channels'),
       ipcRenderer.invoke('get-token'),
     ]).then(([url, name, servers, activeChannels, token]) => {
-      setAvatarUrl(url);
+      // setAvatarUrl(url);
       setName(name);
       setServers(servers);
       setActiveChannels(activeChannels);
       if (token) {
         setToken(token);
+      }
+    });
+
+    // listen for responses from the backend
+    ipcRenderer.on('clientMessage', (_e, msg) => {
+      if (msg.type === 'sendAvatar') {
+        console.log('got url');
+        setAvatarUrl(msg.url);
       }
     });
   }, [isLoggedIn]);
