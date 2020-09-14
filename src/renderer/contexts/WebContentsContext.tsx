@@ -16,50 +16,35 @@ import { ipcRenderer } from 'electron';
 
 type ContextType = {
   isReady: boolean;
-  addListener: (cb: MessageCallback<RendererMessage>) => void;
-  removeListener: (cb: MessageCallback<RendererMessage>) => void;
+  rendererListener: RendererListener | null;
+  mainMessenger: IpcMainMessenger | null;
 };
 
 export const WebContentsContext = createContext<ContextType>({
   isReady: false,
-  addListener() {
-    console.log('addListener() not initialized yet');
-  },
-  removeListener() {
-    console.log('removeListener() not initialized yet');
-  },
+  rendererListener: null,
+  mainMessenger: null,
 });
 
 export const WebContentsProvider: React.FC = ({ children }) => {
   const [isReady, setIsReady] = useState(false);
-  const rendererListener = new RendererListener(ipcRenderer);
-  const messenger = new IpcMainMessenger(ipcRenderer);
+  const rendererListener = useMemo(() => new RendererListener(ipcRenderer), []);
+  const mainMessenger = useMemo(() => new IpcMainMessenger(ipcRenderer), []);
 
-  const listen = (message: RendererMessage) => {
-    console.log('listening to message');
-    console.log(message);
-    if (message.type === 'backendReady') {
-      setIsReady(true);
-    }
-  };
-  rendererListener.addListener(listen);
-
-  messenger.send({ type: 'rendererReady' });
-
-  //   useEffect(() => {}, [rendererListener]);
-
-  const addListener = (cb: MessageCallback<RendererMessage>) => {
-    rendererListener.addListener(cb);
-  };
-
-  const removeListener = (cb: MessageCallback<RendererMessage>) => {
-    rendererListener.removeListener(cb);
-  };
+  useEffect(() => {
+    const listen = (message: RendererMessage) => {
+      if (message.type === 'backendReady') {
+        setIsReady(true);
+      }
+    };
+    rendererListener.addListener(listen);
+    mainMessenger.send({ type: 'rendererReady' });
+  }, [rendererListener]);
 
   const value = {
     isReady,
-    addListener,
-    removeListener,
+    rendererListener,
+    mainMessenger,
   };
 
   console.log('rendering web contents');

@@ -61,6 +61,7 @@ export function setupMainListener(app: App, cb: () => void): void {
    * before telling the renderer it's ready.
    */
   let clientInitialized = false;
+  let clientLoggedIn = false;
   let rendererInitialized = false;
 
   /**
@@ -75,17 +76,21 @@ export function setupMainListener(app: App, cb: () => void): void {
    * initialized. It's kind of a chicken-and-egg problem
    * ~reccanti 9/12/2020
    */
-  app.on('browser-window-created', (_e, browserWindow) => {
+  app.on('browser-window-created', async (_e, browserWindow) => {
     const rendererMessenger = new RendererMessenger(browserWindow);
     const listener = new MainListener(ipcMain, clientProcess);
 
-    getToken().then(async (token) => {
-      if (token) {
-        clientMessenger.send({ type: 'sendTokenMessage', token });
-      }
-    });
+    const token = await getToken();
+    if (token) {
+      clientMessenger.send({ type: 'clientSendToken', token });
+    }
 
     listener.addListener((msg) => {
+      // All of this is stuff that's sort of sequential and
+      // hard to time properly, that's the reason we have
+      // all of these flags. Maybe a better solution would be
+      // to have some sort of state object that we pass
+      // around. That would at least keep everything in-sync
       if (msg.type === 'rendererReady') {
         rendererInitialized = true;
         if (clientInitialized) {
@@ -98,6 +103,23 @@ export function setupMainListener(app: App, cb: () => void): void {
           rendererMessenger.send({ type: 'backendReady' });
         }
       }
+      if (msg.type === 'clientLoggedIn') {
+        clientLoggedIn = true;
+        if (rendererInitialized) {
+          rendererMessenger.send({ type: 'backendLoggedIn' });
+        }
+      }
+      if (msg.type === 'rendererGetToken') {
+        if (token) {
+          rendererMessenger.send({ type: 'rendererSendToken', token });
+        }
+        if (clientLoggedIn) {
+          rendererMessenger.send({ type: 'backendLoggedIn' });
+        }
+      }
+      // This stuff should be a little more stable, since it
+      // won't be requested until the frontend knows it's
+      // logged in
     });
   });
 
@@ -110,11 +132,11 @@ export function setupMainListener(app: App, cb: () => void): void {
     app.exit();
   });
 
-  ipcMain.handle('get-bot-url', () => {
-    console.log('requesting url...');
-    clientProcess.send({ type: 'getAvatar' });
-    // return Promise.resolve(bot.getAvatarUrl());
-  });
+  // ipcMain.handle('get-bot-url', () => {
+  //   console.log('requesting url...');
+  //   clientProcess.send({ type: 'getAvatar' });
+  //   // return Promise.resolve(bot.getAvatarUrl());
+  // });
 
   cb();
 

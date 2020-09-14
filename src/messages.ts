@@ -29,7 +29,19 @@ interface BackendReadyMessage extends BaseMessage {
   type: 'backendReady';
 }
 
-export type RendererMessage = BackendReadyMessage;
+interface BackendLoggedInMessage extends BaseMessage {
+  type: 'backendLoggedIn';
+}
+
+interface SendTokenRendererMessage extends BaseMessage {
+  type: 'rendererSendToken';
+  token: string;
+}
+
+export type RendererMessage =
+  | BackendReadyMessage
+  | SendTokenRendererMessage
+  | BackendLoggedInMessage;
 
 export class RendererMessenger implements Messenger<RendererMessage> {
   private browserWindow: BrowserWindow;
@@ -50,7 +62,6 @@ export class RendererListener implements Listener<RendererMessage> {
   constructor(renderer: IpcRenderer) {
     this.renderer = renderer;
     this.renderer.on(MESSAGE_CHANNEL, (_e, msg: RendererMessage) => {
-      console.log(msg);
       this.callbacks.forEach((cb) => {
         cb(msg);
       });
@@ -77,7 +88,19 @@ interface RendererReadyMessage extends BaseMessage {
   type: 'rendererReady';
 }
 
-export type MainMessage = ClientReadyMessage | RendererReadyMessage;
+interface GetTokenMessage extends BaseMessage {
+  type: 'rendererGetToken';
+}
+
+interface ClientLoggedInMessage extends BaseMessage {
+  type: 'clientLoggedIn';
+}
+
+export type MainMessage =
+  | ClientReadyMessage
+  | ClientLoggedInMessage
+  | RendererReadyMessage
+  | GetTokenMessage;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -146,12 +169,12 @@ export class MainListener implements Listener<MainMessage> {
 /**
  * 3. Client
  */
-interface SendTokenMessage extends BaseMessage {
-  type: 'sendTokenMessage';
+interface SendTokenClientMessage extends BaseMessage {
+  type: 'clientSendToken';
   token: string;
 }
 
-export type ClientMessage = SendTokenMessage;
+export type ClientMessage = SendTokenClientMessage;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

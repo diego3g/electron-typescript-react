@@ -9,7 +9,9 @@
  */
 import { ipcRenderer } from 'electron';
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { render } from 'react-dom';
 import { WebContentsContext } from './WebContentsContext';
+import { RendererMessage } from '../../messages';
 
 export type ServerInfo = {
   name: string;
@@ -56,7 +58,9 @@ export const BotContext = createContext<ContextType>({
 });
 
 export const BotProvider: React.FC = ({ children }) => {
-  const { isReady } = useContext(WebContentsContext);
+  const { isReady, rendererListener, mainMessenger } = useContext(
+    WebContentsContext
+  );
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [name, setName] = useState<string>('');
@@ -64,34 +68,55 @@ export const BotProvider: React.FC = ({ children }) => {
   const [activeChannels, setActiveChannels] = useState<VoiceChannelInfo[]>([]);
   const [token, setToken] = useState<string>('');
 
+  /**
+   * Used to see if the user is already logged into the application
+   */
+  useEffect(() => {
+    if (isReady && mainMessenger && rendererListener) {
+      const listen = (msg: RendererMessage) => {
+        if (msg.type === 'rendererSendToken') {
+          setToken(msg.token);
+        }
+        if (msg.type === 'backendLoggedIn') {
+          setIsLoggedIn(true);
+        }
+      };
+      rendererListener.addListener(listen);
+      mainMessenger.send({ type: 'rendererGetToken' });
+      return () => {
+        rendererListener.removeListener(listen);
+      };
+    }
+  }, [isReady, mainMessenger, rendererListener]);
+
   useEffect(() => {
     // request data from the backend
-    if (isReady) {
-      Promise.all([
-        ipcRenderer.invoke('get-bot-url'),
-        ipcRenderer.invoke('get-bot-name'),
-        ipcRenderer.invoke('get-joined-servers'),
-        ipcRenderer.invoke('get-active-voice-channels'),
-        ipcRenderer.invoke('get-token'),
-      ]).then(([url, name, servers, activeChannels, token]) => {
-        // setAvatarUrl(url);
-        setName(name);
-        setServers(servers);
-        setActiveChannels(activeChannels);
-        if (token) {
-          setToken(token);
-        }
-      });
-
-      // listen for responses from the backend
-      ipcRenderer.on('clientMessage', (_e, msg) => {
-        if (msg.type === 'sendAvatar') {
-          console.log('got url');
-          setAvatarUrl(msg.url);
-        }
-      });
+    if (isReady && isLoggedIn && mainMessenger && rendererListener) {
+      console.log('ready for logged in stuff!!!');
+      // Promise.all([
+      //   ipcRenderer.invoke('get-bot-url'),
+      //   ipcRenderer.invoke('get-bot-name'),
+      //   ipcRenderer.invoke('get-joined-servers'),
+      //   ipcRenderer.invoke('get-active-voice-channels'),
+      //   ipcRenderer.invoke('get-token'),
+      // ]).then(([url, name, servers, activeChannels, token]) => {
+      //   // setAvatarUrl(url);
+      //   setName(name);
+      //   setServers(servers);
+      //   setActiveChannels(activeChannels);
+      //   if (token) {
+      //     setToken(token);
+      //   }
+      // });
+      // // listen for responses from the backend
+      // ipcRenderer.on('clientMessage', (_e, msg) => {
+      //   if (msg.type === 'sendAvatar') {
+      //     console.log('got url');
+      //     setAvatarUrl(msg.url);
+      //   }
+      // });
     }
-  }, [isLoggedIn, isReady]);
+  }, [isLoggedIn, isReady, mainMessenger, rendererListener]);
 
   async function login(token: string) {
     const didLogIn = await ipcRenderer.invoke('login', token);
