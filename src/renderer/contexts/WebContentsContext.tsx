@@ -9,14 +9,15 @@ import React, { createContext, useEffect, useState, useMemo } from 'react';
 import {
   RendererListener,
   RendererMessage,
-  RendererMessageCallback,
+  MessageCallback,
+  IpcMainMessenger,
 } from '../../messages';
 import { ipcRenderer } from 'electron';
 
 type ContextType = {
   isReady: boolean;
-  addListener: (cb: RendererMessageCallback) => void;
-  removeListener: (cb: RendererMessageCallback) => void;
+  addListener: (cb: MessageCallback<RendererMessage>) => void;
+  removeListener: (cb: MessageCallback<RendererMessage>) => void;
 };
 
 export const WebContentsContext = createContext<ContextType>({
@@ -31,25 +32,27 @@ export const WebContentsContext = createContext<ContextType>({
 
 export const WebContentsProvider: React.FC = ({ children }) => {
   const [isReady, setIsReady] = useState(false);
-  const rendererListener = useMemo(() => new RendererListener(ipcRenderer), []);
+  const rendererListener = new RendererListener(ipcRenderer);
+  const messenger = new IpcMainMessenger(ipcRenderer);
 
-  useEffect(() => {
-    const listen = (message: RendererMessage) => {
-      if (message.type === 'backendReady') {
-        setIsReady(true);
-      }
-    };
-    rendererListener.addListener(listen);
-    return () => {
-      rendererListener.removeListener(listen);
-    };
-  }, [rendererListener]);
+  const listen = (message: RendererMessage) => {
+    console.log('listening to message');
+    console.log(message);
+    if (message.type === 'backendReady') {
+      setIsReady(true);
+    }
+  };
+  rendererListener.addListener(listen);
 
-  const addListener = (cb: RendererMessageCallback) => {
+  messenger.send({ type: 'rendererReady' });
+
+  //   useEffect(() => {}, [rendererListener]);
+
+  const addListener = (cb: MessageCallback<RendererMessage>) => {
     rendererListener.addListener(cb);
   };
 
-  const removeListener = (cb: RendererMessageCallback) => {
+  const removeListener = (cb: MessageCallback<RendererMessage>) => {
     rendererListener.removeListener(cb);
   };
 

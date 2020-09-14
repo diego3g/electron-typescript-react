@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ipcRenderer } from 'electron';
 import { BotContext } from './BotContext';
+import { WebContentsContext } from './WebContentsContext';
 
 export type DeviceInfo = {
   id: number;
@@ -31,27 +32,32 @@ export const PortAudioProvider: React.FC = ({ children }) => {
   const [devices, setDevices] = useState<DeviceInfo[]>([]);
   const [sample, setSample] = useState(0);
   const { isLoggedIn } = useContext(BotContext);
+  const { isReady } = useContext(WebContentsContext);
 
   useEffect(() => {
-    Promise.all([ipcRenderer.invoke('get-devices')]).then(([devices]) => {
-      setDevices(devices);
-    });
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    let prev = 0;
-    async function listen() {
-      requestAnimationFrame(async (cur) => {
-        if (cur - prev > 500) {
-          prev = cur;
-          const sample = await ipcRenderer.invoke('get-sample');
-          setSample(sample);
-        }
-        listen();
+    if (isReady && isLoggedIn) {
+      Promise.all([ipcRenderer.invoke('get-devices')]).then(([devices]) => {
+        setDevices(devices);
       });
     }
-    listen();
-  }, [isLoggedIn]);
+  }, [isReady, isLoggedIn]);
+
+  useEffect(() => {
+    if (isReady && isLoggedIn) {
+      let prev = 0;
+      const listen = async () => {
+        requestAnimationFrame(async (cur) => {
+          if (cur - prev > 500) {
+            prev = cur;
+            const sample = await ipcRenderer.invoke('get-sample');
+            setSample(sample);
+          }
+          listen();
+        });
+      };
+      listen();
+    }
+  }, [isLoggedIn, isReady]);
 
   const startBroadcast = async (device: DeviceInfo) => {
     await ipcRenderer.invoke('start-broadcast', device);

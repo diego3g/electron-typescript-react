@@ -8,7 +8,8 @@
  * or through hooks.
  */
 import { ipcRenderer } from 'electron';
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { WebContentsContext } from './WebContentsContext';
 
 export type ServerInfo = {
   name: string;
@@ -55,6 +56,7 @@ export const BotContext = createContext<ContextType>({
 });
 
 export const BotProvider: React.FC = ({ children }) => {
+  const { isReady } = useContext(WebContentsContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [name, setName] = useState<string>('');
@@ -64,30 +66,32 @@ export const BotProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     // request data from the backend
-    Promise.all([
-      ipcRenderer.invoke('get-bot-url'),
-      ipcRenderer.invoke('get-bot-name'),
-      ipcRenderer.invoke('get-joined-servers'),
-      ipcRenderer.invoke('get-active-voice-channels'),
-      ipcRenderer.invoke('get-token'),
-    ]).then(([url, name, servers, activeChannels, token]) => {
-      // setAvatarUrl(url);
-      setName(name);
-      setServers(servers);
-      setActiveChannels(activeChannels);
-      if (token) {
-        setToken(token);
-      }
-    });
+    if (isReady) {
+      Promise.all([
+        ipcRenderer.invoke('get-bot-url'),
+        ipcRenderer.invoke('get-bot-name'),
+        ipcRenderer.invoke('get-joined-servers'),
+        ipcRenderer.invoke('get-active-voice-channels'),
+        ipcRenderer.invoke('get-token'),
+      ]).then(([url, name, servers, activeChannels, token]) => {
+        // setAvatarUrl(url);
+        setName(name);
+        setServers(servers);
+        setActiveChannels(activeChannels);
+        if (token) {
+          setToken(token);
+        }
+      });
 
-    // listen for responses from the backend
-    ipcRenderer.on('clientMessage', (_e, msg) => {
-      if (msg.type === 'sendAvatar') {
-        console.log('got url');
-        setAvatarUrl(msg.url);
-      }
-    });
-  }, [isLoggedIn]);
+      // listen for responses from the backend
+      ipcRenderer.on('clientMessage', (_e, msg) => {
+        if (msg.type === 'sendAvatar') {
+          console.log('got url');
+          setAvatarUrl(msg.url);
+        }
+      });
+    }
+  }, [isLoggedIn, isReady]);
 
   async function login(token: string) {
     const didLogIn = await ipcRenderer.invoke('login', token);

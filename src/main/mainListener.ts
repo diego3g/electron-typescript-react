@@ -17,19 +17,19 @@
  * ~reccanti 9/7/2020
  */
 
-import { Client, VoiceBroadcast } from 'discord.js';
 import { App, ipcMain } from 'electron';
-import fs from 'fs';
 import path from 'path';
+import { getToken, setToken } from './credentials';
+import { spawn, fork } from 'child_process';
+import { Client, VoiceBroadcast } from 'discord.js';
+import fs from 'fs';
 import { BotWrapper } from '../client/botWrapper';
 import portAudio, { ReadableAudioStream } from 'naudiodon';
 import {
   createAudioDevice,
   createDeviceBroadcast,
 } from '../client/deviceBroadcastStream';
-import { getToken, setToken } from './credentials';
-import { spawn, fork } from 'child_process';
-import { Message } from '@material-ui/icons';
+import { ClientMessenger, RendererMessenger, MainListener } from '../messages';
 
 type VoiceChannelInfo = {
   id: string;
@@ -50,16 +50,55 @@ export function setupMainListener(app: App, cb: () => void): void {
       stdio: ['ipc', 'pipe', 'pipe'],
     }
   );
+  const clientMessenger = new ClientMessenger(clientProcess);
 
-  getToken().then(async (token) => {
-    if (token) {
-      clientProcess.send({ type: 'login', token }, (err) => {
-        if (err) throw err;
-        cb();
-      });
-    } else {
-      cb();
-    }
+  /**
+   * We're using these variables to track whether the client
+   * has been intialized because there's kind of a race condition.
+   * If the client finishes initialization before the renderer,
+   * we'll tell the renderer it's ready after the renderer has been
+   * initialized. Otherwise, we'll wait until the client is initialized
+   * before telling the renderer it's ready.
+   */
+  let clientInitialized = false;
+  let rendererInitialized = false;
+
+  /**
+   * @TODO Not sure if this is the best way to handle this.
+   * Essentially what this is doing is waiting for a window
+   * to be initialized so we can snag a reference to it and
+   * start posting messages to it.
+   *
+   * A better way to do it might be to initialize the window
+   * first, get it's reference, then pass that to this function.
+   * But then we wouldn't have handler ready when the window is
+   * initialized. It's kind of a chicken-and-egg problem
+   * ~reccanti 9/12/2020
+   */
+  app.on('browser-window-created', (_e, browserWindow) => {
+    const rendererMessenger = new RendererMessenger(browserWindow);
+    const listener = new MainListener(ipcMain, clientProcess);
+
+    getToken().then(async (token) => {
+      if (token) {
+        clientMessenger.send({ type: 'sendTokenMessage', token });
+      }
+    });
+
+    listener.addListener((msg) => {
+      if (msg.type === 'rendererReady') {
+        rendererInitialized = true;
+        if (clientInitialized) {
+          rendererMessenger.send({ type: 'backendReady' });
+        }
+      }
+      if (msg.type === 'clientReady') {
+        clientInitialized = true;
+        if (rendererInitialized) {
+          rendererMessenger.send({ type: 'backendReady' });
+        }
+      }
+    });
   });
 
   clientProcess.stdout?.on('data', (data) => {
@@ -77,30 +116,7 @@ export function setupMainListener(app: App, cb: () => void): void {
     // return Promise.resolve(bot.getAvatarUrl());
   });
 
-  /**
-   * @TODO Not sure if this is the best way to handle this.
-   * Essentially what this is doing is waiting for a window
-   * to be initialized so we can snag a reference to it and
-   * start posting messages to it.
-   *
-   * A better way to do it might be to initialize the window
-   * first, get it's reference, then pass that to this function.
-   * But then we wouldn't have handler ready when the window is
-   * initialized. It's kind of a chicken-and-egg problem
-   * ~reccanti 9/12/2020
-   */
-  app.on('browser-window-created', (_e, browserWindow) => {
-    console.log('new window!');
-    clientProcess.on('message', (msg) => {
-      if (msg.type === 'sendAvatar') {
-        console.log(msg);
-        browserWindow.webContents.postMessage('clientMessage', {
-          type: msg.type,
-          url: msg.url,
-        });
-      }
-    });
-  });
+  cb();
 
   /**
    * Initialize the Discord client and bot wrapper
