@@ -31,17 +31,6 @@ import {
 } from '../client/deviceBroadcastStream';
 import { ClientMessenger, RendererMessenger, MainListener } from '../messages';
 
-type VoiceChannelInfo = {
-  id: string;
-  serverId: string;
-  name: string;
-};
-
-type DeviceInfo = {
-  id: number;
-  name: string;
-};
-
 export function setupMainListener(app: App, cb: () => void): void {
   const clientProcess = fork(
     path.resolve(__dirname, '../client/discordClient.js'),
@@ -82,7 +71,7 @@ export function setupMainListener(app: App, cb: () => void): void {
 
     const token = await getToken();
     if (token) {
-      clientMessenger.send({ type: 'clientSendToken', token });
+      clientMessenger.send({ type: 'mainSendToken', token });
     }
 
     listener.addListener((msg) => {
@@ -111,7 +100,7 @@ export function setupMainListener(app: App, cb: () => void): void {
       }
       if (msg.type === 'rendererGetToken') {
         if (token) {
-          rendererMessenger.send({ type: 'rendererSendToken', token });
+          rendererMessenger.send({ type: 'backendSendToken', token });
         }
         if (clientLoggedIn) {
           rendererMessenger.send({ type: 'backendLoggedIn' });
@@ -120,6 +109,36 @@ export function setupMainListener(app: App, cb: () => void): void {
       // This stuff should be a little more stable, since it
       // won't be requested until the frontend knows it's
       // logged in
+      if (msg.type === 'rendererGetAvatar') {
+        clientMessenger.send({ type: 'mainGetAvatar' });
+      }
+      if (msg.type === 'rendererGetName') {
+        clientMessenger.send({ type: 'mainGetName' });
+      }
+      if (msg.type === 'rendererGetJoinedServers') {
+        clientMessenger.send({ type: 'mainGetJoinedServers' });
+      }
+      if (msg.type === 'rendererGetActiveVoiceChannels') {
+        clientMessenger.send({ type: 'mainGetActiveVoiceChannels' });
+      }
+      if (msg.type === 'clientSendAvatar') {
+        rendererMessenger.send({ type: 'backendSendAvatar', url: msg.url });
+      }
+      if (msg.type === 'clientSendName') {
+        rendererMessenger.send({ type: 'backendSendName', name: msg.name });
+      }
+      if (msg.type === 'clientSendJoinedServers') {
+        rendererMessenger.send({
+          type: 'backendSendJoinedServers',
+          servers: msg.servers,
+        });
+      }
+      if (msg.type === 'clientSendActiveVoiceChannels') {
+        rendererMessenger.send({
+          type: 'backendSendActiveVoiceChannels',
+          voiceChannels: msg.voiceChannels,
+        });
+      }
     });
   });
 

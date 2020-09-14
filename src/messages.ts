@@ -4,12 +4,32 @@
  */
 import { IpcRenderer, IpcMain, BrowserWindow } from 'electron';
 import { ChildProcess } from 'child_process';
+import { Base } from 'discord.js';
 
+/**
+ * 0. General-purpose types and constants
+ */
 const MESSAGE_CHANNEL = 'messageChannel';
 
 interface BaseMessage {
   type: string;
 }
+
+export type ServerInfo = {
+  id: string;
+  name: string;
+};
+
+export type VoiceChannelInfo = {
+  id: string;
+  serverId: string;
+  name: string;
+};
+
+export type DeviceInfo = {
+  id: number;
+  name: string;
+};
 
 export type MessageCallback<MessageType> = (message: MessageType) => void;
 
@@ -33,15 +53,39 @@ interface BackendLoggedInMessage extends BaseMessage {
   type: 'backendLoggedIn';
 }
 
-interface SendTokenRendererMessage extends BaseMessage {
-  type: 'rendererSendToken';
+interface BackendTokenMessage extends BaseMessage {
+  type: 'backendSendToken';
   token: string;
+}
+
+interface BackendAvatarMessage extends BaseMessage {
+  type: 'backendSendAvatar';
+  url: string;
+}
+
+interface BackendNameMessage extends BaseMessage {
+  type: 'backendSendName';
+  name: string;
+}
+
+interface BackendJoinedServersMessage extends BaseMessage {
+  type: 'backendSendJoinedServers';
+  servers: ServerInfo[];
+}
+
+interface BackendActiveVoiceChannelsMessage extends BaseMessage {
+  type: 'backendSendActiveVoiceChannels';
+  voiceChannels: VoiceChannelInfo[];
 }
 
 export type RendererMessage =
   | BackendReadyMessage
-  | SendTokenRendererMessage
-  | BackendLoggedInMessage;
+  | BackendTokenMessage
+  | BackendLoggedInMessage
+  | BackendAvatarMessage
+  | BackendNameMessage
+  | BackendJoinedServersMessage
+  | BackendActiveVoiceChannelsMessage;
 
 export class RendererMessenger implements Messenger<RendererMessage> {
   private browserWindow: BrowserWindow;
@@ -84,23 +128,67 @@ interface ClientReadyMessage extends BaseMessage {
   type: 'clientReady';
 }
 
+interface ClientLoggedInMessage extends BaseMessage {
+  type: 'clientLoggedIn';
+}
+
+interface ClientAvatarMessage extends BaseMessage {
+  type: 'clientSendAvatar';
+  url: string;
+}
+
+interface ClientNameMessage extends BaseMessage {
+  type: 'clientSendName';
+  name: string;
+}
+
+interface ClientJoinedServersMessage extends BaseMessage {
+  type: 'clientSendJoinedServers';
+  servers: ServerInfo[];
+}
+
+interface ClientActiveVoiceChannelsMessage extends BaseMessage {
+  type: 'clientSendActiveVoiceChannels';
+  voiceChannels: VoiceChannelInfo[];
+}
+
 interface RendererReadyMessage extends BaseMessage {
   type: 'rendererReady';
 }
 
-interface GetTokenMessage extends BaseMessage {
+interface RendererTokenMessage extends BaseMessage {
   type: 'rendererGetToken';
 }
 
-interface ClientLoggedInMessage extends BaseMessage {
-  type: 'clientLoggedIn';
+interface RendererAvatarMessage extends BaseMessage {
+  type: 'rendererGetAvatar';
+}
+
+interface RendererNameMessage extends BaseMessage {
+  type: 'rendererGetName';
+}
+
+interface RendererJoinedServersMessage extends BaseMessage {
+  type: 'rendererGetJoinedServers';
+}
+
+interface RendererActiveVoiceChannels extends BaseMessage {
+  type: 'rendererGetActiveVoiceChannels';
 }
 
 export type MainMessage =
   | ClientReadyMessage
   | ClientLoggedInMessage
+  | ClientAvatarMessage
+  | ClientNameMessage
+  | ClientJoinedServersMessage
+  | ClientActiveVoiceChannelsMessage
   | RendererReadyMessage
-  | GetTokenMessage;
+  | RendererTokenMessage
+  | RendererAvatarMessage
+  | RendererNameMessage
+  | RendererJoinedServersMessage
+  | RendererActiveVoiceChannels;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -169,12 +257,33 @@ export class MainListener implements Listener<MainMessage> {
 /**
  * 3. Client
  */
-interface SendTokenClientMessage extends BaseMessage {
-  type: 'clientSendToken';
+interface MainSendToken extends BaseMessage {
+  type: 'mainSendToken';
   token: string;
 }
 
-export type ClientMessage = SendTokenClientMessage;
+interface MainAvaterMessage extends BaseMessage {
+  type: 'mainGetAvatar';
+}
+
+interface MainNameMessage extends BaseMessage {
+  type: 'mainGetName';
+}
+
+interface MainJoinedServerMessage extends BaseMessage {
+  type: 'mainGetJoinedServers';
+}
+
+interface MainActiveVoiceChannelsMessage extends BaseMessage {
+  type: 'mainGetActiveVoiceChannels';
+}
+
+export type ClientMessage =
+  | MainSendToken
+  | MainAvaterMessage
+  | MainNameMessage
+  | MainJoinedServerMessage
+  | MainActiveVoiceChannelsMessage;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

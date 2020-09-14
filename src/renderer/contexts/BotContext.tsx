@@ -74,7 +74,7 @@ export const BotProvider: React.FC = ({ children }) => {
   useEffect(() => {
     if (isReady && mainMessenger && rendererListener) {
       const listen = (msg: RendererMessage) => {
-        if (msg.type === 'rendererSendToken') {
+        if (msg.type === 'backendSendToken') {
           setToken(msg.token);
         }
         if (msg.type === 'backendLoggedIn') {
@@ -92,7 +92,29 @@ export const BotProvider: React.FC = ({ children }) => {
   useEffect(() => {
     // request data from the backend
     if (isReady && isLoggedIn && mainMessenger && rendererListener) {
-      console.log('ready for logged in stuff!!!');
+      const listen = (msg: RendererMessage) => {
+        if (msg.type === 'backendSendAvatar') {
+          setAvatarUrl(msg.url);
+        }
+        if (msg.type === 'backendSendName') {
+          setName(msg.name);
+        }
+        if (msg.type === 'backendSendJoinedServers') {
+          setServers(msg.servers);
+        }
+        if (msg.type === 'backendSendActiveVoiceChannels') {
+          setActiveChannels(msg.voiceChannels);
+        }
+      };
+      rendererListener.addListener(listen);
+      mainMessenger.send({ type: 'rendererGetAvatar' });
+      mainMessenger.send({ type: 'rendererGetName' });
+      mainMessenger.send({ type: 'rendererGetJoinedServers' });
+      mainMessenger.send({ type: 'rendererGetActiveVoiceChannels' });
+
+      return () => {
+        rendererListener.removeListener(listen);
+      };
       // Promise.all([
       //   ipcRenderer.invoke('get-bot-url'),
       //   ipcRenderer.invoke('get-bot-name'),
