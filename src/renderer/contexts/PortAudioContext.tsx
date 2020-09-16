@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ipcRenderer } from 'electron';
 import { BotContext } from './BotContext';
 import { WebContentsContext } from './WebContentsContext';
+import { RendererMessage } from '../../messages';
+import { render } from 'react-dom';
 
 export type DeviceInfo = {
   id: number;
@@ -32,15 +34,22 @@ export const PortAudioProvider: React.FC = ({ children }) => {
   const [devices, setDevices] = useState<DeviceInfo[]>([]);
   const [sample, setSample] = useState(0);
   const { isLoggedIn } = useContext(BotContext);
-  const { isReady } = useContext(WebContentsContext);
+  const { isReady, rendererListener, mainMessenger } = useContext(
+    WebContentsContext
+  );
 
   useEffect(() => {
-    if (isReady && isLoggedIn) {
-      Promise.all([ipcRenderer.invoke('get-devices')]).then(([devices]) => {
-        setDevices(devices);
-      });
+    if (isReady && isLoggedIn && rendererListener && mainMessenger) {
+      const listen = (msg: RendererMessage) => {
+        if (msg.type === 'backendSendDevices') {
+          setDevices(msg.devices);
+        }
+      };
+      rendererListener.addListener(listen);
+      mainMessenger.send({ type: 'rendererGetDevices' });
+      return () => rendererListener?.removeListener(listen);
     }
-  }, [isReady, isLoggedIn]);
+  }, [isReady, isLoggedIn, rendererListener, mainMessenger]);
 
   useEffect(() => {
     if (isReady && isLoggedIn) {

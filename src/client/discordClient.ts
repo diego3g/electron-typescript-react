@@ -2,10 +2,16 @@ import { Client, Guild, VoiceChannel } from 'discord.js';
 import { BotWrapper } from './botWrapper';
 import {
   ClientListener,
+  DeviceInfo,
   MainProcessMessenger,
   ServerInfo,
   VoiceChannelInfo,
 } from '../messages';
+import { Device, getDevices } from 'naudiodon';
+import {
+  createAudioDevice,
+  createDeviceBroadcast,
+} from './deviceBroadcastStream';
 
 // utility functions for returning the correct data type
 function toVoiceChannelInfo(channel: VoiceChannel): VoiceChannelInfo {
@@ -23,6 +29,13 @@ function toServerInfo(server: Guild): ServerInfo {
   };
 }
 
+function toDeviceInfo(device: Device): DeviceInfo {
+  return {
+    id: device.id,
+    name: device.name,
+  };
+}
+
 async function initialize() {
   const listener = new ClientListener(process);
   const messenger = new MainProcessMessenger(process);
@@ -30,6 +43,9 @@ async function initialize() {
 
   client.on('ready', () => {
     const bot = new BotWrapper(client);
+    let deviceStream = null;
+    let broadcastStream = null;
+
     messenger.send({ type: 'clientLoggedIn' });
 
     listener.addListener(async (msg) => {
@@ -101,6 +117,25 @@ async function initialize() {
           type: 'clientSendActiveVoiceChannels',
           voiceChannels: bot.getActiveVoiceChannels().map(toVoiceChannelInfo),
         });
+      }
+      if (msg.type === 'mainGetDevices') {
+        messenger.send({
+          type: 'clientSendDevices',
+          devices: getDevices().map(toDeviceInfo),
+        });
+      }
+      if (msg.type === 'mainSetDevice') {
+        const device = getDevices().find(
+          (device) => device.id === msg.device.id
+        );
+        if (device) {
+          deviceStream = createAudioDevice(device);
+          broadcastStream = createDeviceBroadcast(client, deviceStream);
+          messenger.send({
+            type: 'clientDeviceSet',
+            device: toDeviceInfo(device),
+          });
+        }
       }
     });
   });

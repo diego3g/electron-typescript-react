@@ -4,7 +4,6 @@
  */
 import { IpcRenderer, IpcMain, BrowserWindow } from 'electron';
 import { ChildProcess } from 'child_process';
-import { Base } from 'discord.js';
 
 /**
  * 0. General-purpose types and constants
@@ -83,6 +82,16 @@ interface BackendVoiceChannelsInServer extends BaseMessage {
   voiceChannels: VoiceChannelInfo[];
 }
 
+interface BackendSendDevices extends BaseMessage {
+  type: 'backendSendDevices';
+  devices: DeviceInfo[];
+}
+
+interface BackendDeviceSet extends BaseMessage {
+  type: 'backendDeviceSet';
+  device: DeviceInfo;
+}
+
 export type RendererMessage =
   | BackendReadyMessage
   | BackendTokenMessage
@@ -91,7 +100,9 @@ export type RendererMessage =
   | BackendNameMessage
   | BackendJoinedServersMessage
   | BackendActiveVoiceChannelsMessage
-  | BackendVoiceChannelsInServer;
+  | BackendVoiceChannelsInServer
+  | BackendSendDevices
+  | BackendDeviceSet;
 
 export class RendererMessenger implements Messenger<RendererMessage> {
   private browserWindow: BrowserWindow;
@@ -163,6 +174,16 @@ interface ClientChannelsInServer extends BaseMessage {
   voiceChannels: VoiceChannelInfo[];
 }
 
+interface ClientSendDevices extends BaseMessage {
+  type: 'clientSendDevices';
+  devices: DeviceInfo[];
+}
+
+interface ClientDeviceSet extends BaseMessage {
+  type: 'clientDeviceSet';
+  device: DeviceInfo;
+}
+
 interface RendererReadyMessage extends BaseMessage {
   type: 'rendererReady';
 }
@@ -202,6 +223,15 @@ interface RendererChannelsInServer extends BaseMessage {
   server: ServerInfo;
 }
 
+interface RendererDevices extends BaseMessage {
+  type: 'rendererGetDevices';
+}
+
+interface RendererSetDevice extends BaseMessage {
+  type: 'rendererSetDevice';
+  device: DeviceInfo;
+}
+
 export type MainMessage =
   | ClientReadyMessage
   | ClientLoggedInMessage
@@ -210,6 +240,8 @@ export type MainMessage =
   | ClientJoinedServersMessage
   | ClientActiveVoiceChannelsMessage
   | ClientChannelsInServer
+  | ClientSendDevices
+  | ClientDeviceSet
   | RendererReadyMessage
   | RendererTokenMessage
   | RendererAvatarMessage
@@ -218,7 +250,9 @@ export type MainMessage =
   | RendererActiveVoiceChannels
   | RendererJoinChannel
   | RendererLeaveChannel
-  | RendererChannelsInServer;
+  | RendererChannelsInServer
+  | RendererDevices
+  | RendererSetDevice;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -323,6 +357,15 @@ interface MainChannelsInServer extends BaseMessage {
   server: ServerInfo;
 }
 
+interface MainDevice extends BaseMessage {
+  type: 'mainGetDevices';
+}
+
+interface MainSetDevice extends BaseMessage {
+  type: 'mainSetDevice';
+  device: DeviceInfo;
+}
+
 export type ClientMessage =
   | MainSendToken
   | MainAvaterMessage
@@ -331,7 +374,9 @@ export type ClientMessage =
   | MainActiveVoiceChannelsMessage
   | MainJoinChannel
   | MainLeaveChannel
-  | MainChannelsInServer;
+  | MainChannelsInServer
+  | MainDevice
+  | MainSetDevice;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

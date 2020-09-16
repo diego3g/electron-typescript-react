@@ -121,6 +121,26 @@ export function setupMainListener(app: App, cb: () => void): void {
       if (msg.type === 'rendererGetActiveVoiceChannels') {
         clientMessenger.send({ type: 'mainGetActiveVoiceChannels' });
       }
+      if (msg.type === 'rendererJoinChannel') {
+        clientMessenger.send({
+          type: 'mainJoinChannel',
+          voiceChannel: msg.voiceChannel,
+        });
+      }
+      if (msg.type === 'rendererLeaveChannel') {
+        clientMessenger.send({
+          type: 'mainLeaveChannel',
+          voiceChannel: msg.voiceChannel,
+        });
+      }
+      if (msg.type === 'rendererGetDevices') {
+        clientMessenger.send({
+          type: 'mainGetDevices',
+        });
+      }
+      if (msg.type === 'rendererSetDevice') {
+        clientMessenger.send({ type: 'mainSetDevice', device: msg.device });
+      }
       if (msg.type === 'clientSendAvatar') {
         rendererMessenger.send({ type: 'backendSendAvatar', url: msg.url });
       }
@@ -151,16 +171,16 @@ export function setupMainListener(app: App, cb: () => void): void {
           voiceChannels: msg.voiceChannels,
         });
       }
-      if (msg.type === 'rendererJoinChannel') {
-        clientMessenger.send({
-          type: 'mainJoinChannel',
-          voiceChannel: msg.voiceChannel,
+      if (msg.type === 'clientSendDevices') {
+        rendererMessenger.send({
+          type: 'backendSendDevices',
+          devices: msg.devices,
         });
       }
-      if (msg.type === 'rendererLeaveChannel') {
-        clientMessenger.send({
-          type: 'mainLeaveChannel',
-          voiceChannel: msg.voiceChannel,
+      if (msg.type === 'clientDeviceSet') {
+        rendererMessenger.send({
+          type: 'backendDeviceSet',
+          device: msg.device,
         });
       }
     });

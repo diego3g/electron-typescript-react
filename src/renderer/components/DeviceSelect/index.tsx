@@ -13,9 +13,7 @@ import { DeviceSelectContext } from '../../contexts/DeviceSelectContext';
 const makeLookup = (device: DeviceInfo) => `${device.id}_${device.name}`;
 
 export const DeviceSelect: React.FC = () => {
-  const { devices, currentDevice, setCurrentDevice } = useContext(
-    DeviceSelectContext
-  );
+  const { devices, currentDevice, setDevice } = useContext(DeviceSelectContext);
 
   const deviceLookup = new Map<string, DeviceInfo>();
   devices.forEach((device) => {
@@ -26,10 +24,10 @@ export const DeviceSelect: React.FC = () => {
     const value = e.target.value;
     const device = deviceLookup.get(value);
     if (!device) {
-      setCurrentDevice(null);
+      setDevice(null);
       return;
     }
-    setCurrentDevice(device);
+    setDevice(device);
   };
 
   return (
