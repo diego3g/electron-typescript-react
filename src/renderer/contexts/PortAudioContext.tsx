@@ -13,8 +13,8 @@ export type DeviceInfo = {
 type ContextType = {
   devices: DeviceInfo[];
   sample: number;
-  startBroadcast: (device: DeviceInfo) => Promise<void>;
-  stopBroadcast: () => Promise<void>;
+  startBroadcast: (device: DeviceInfo) => void;
+  stopBroadcast: () => void;
 };
 
 export const PortAudioContext = createContext<ContextType>({
@@ -22,11 +22,9 @@ export const PortAudioContext = createContext<ContextType>({
   sample: 0,
   startBroadcast() {
     console.log('"startBroadcast()" not implemented yet');
-    return Promise.resolve();
   },
   stopBroadcast() {
     console.log('"stopBroadcast()" not implemented yet');
-    return Promise.resolve();
   },
 });
 
@@ -68,12 +66,14 @@ export const PortAudioProvider: React.FC = ({ children }) => {
     }
   }, [isLoggedIn, isReady]);
 
-  const startBroadcast = async (device: DeviceInfo) => {
-    await ipcRenderer.invoke('start-broadcast', device);
+  const startBroadcast = (device: DeviceInfo) => {
+    mainMessenger?.send({ type: 'rendererPlay' });
+    // await ipcRenderer.invoke('start-broadcast', device);
   };
 
-  const stopBroadcast = async () => {
-    await ipcRenderer.invoke('stop-broadcast');
+  const stopBroadcast = () => {
+    mainMessenger?.send({ type: 'rendererStop' });
+    // await ipcRenderer.invoke('stop-broadcast');
   };
 
   const value = {

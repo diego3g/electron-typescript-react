@@ -141,6 +141,12 @@ export function setupMainListener(app: App, cb: () => void): void {
       if (msg.type === 'rendererSetDevice') {
         clientMessenger.send({ type: 'mainSetDevice', device: msg.device });
       }
+      if (msg.type === 'rendererPlay') {
+        clientMessenger.send({ type: 'mainPlay' });
+      }
+      if (msg.type === 'rendererStop') {
+        clientMessenger.send({ type: 'mainStop' });
+      }
       if (msg.type === 'clientSendAvatar') {
         rendererMessenger.send({ type: 'backendSendAvatar', url: msg.url });
       }

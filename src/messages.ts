@@ -232,6 +232,14 @@ interface RendererSetDevice extends BaseMessage {
   device: DeviceInfo;
 }
 
+interface RendererPlay extends BaseMessage {
+  type: 'rendererPlay';
+}
+
+interface RendererStop extends BaseMessage {
+  type: 'rendererStop';
+}
+
 export type MainMessage =
   | ClientReadyMessage
   | ClientLoggedInMessage
@@ -252,7 +260,9 @@ export type MainMessage =
   | RendererLeaveChannel
   | RendererChannelsInServer
   | RendererDevices
-  | RendererSetDevice;
+  | RendererSetDevice
+  | RendererPlay
+  | RendererStop;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -366,6 +376,14 @@ interface MainSetDevice extends BaseMessage {
   device: DeviceInfo;
 }
 
+interface MainPlay extends BaseMessage {
+  type: 'mainPlay';
+}
+
+interface MainStop extends BaseMessage {
+  type: 'mainStop';
+}
+
 export type ClientMessage =
   | MainSendToken
   | MainAvaterMessage
@@ -376,7 +394,9 @@ export type ClientMessage =
   | MainLeaveChannel
   | MainChannelsInServer
   | MainDevice
-  | MainSetDevice;
+  | MainSetDevice
+  | MainPlay
+  | MainStop;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

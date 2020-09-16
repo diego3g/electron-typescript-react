@@ -1,4 +1,4 @@
-import { Client, Guild, VoiceChannel } from 'discord.js';
+import { Client, Guild, VoiceBroadcast, VoiceChannel } from 'discord.js';
 import { BotWrapper } from './botWrapper';
 import {
   ClientListener,
@@ -43,8 +43,8 @@ async function initialize() {
 
   client.on('ready', () => {
     const bot = new BotWrapper(client);
-    let deviceStream = null;
-    let broadcastStream = null;
+    let deviceStream: ReturnType<typeof createAudioDevice> | null = null;
+    let broadcastStream: ReturnType<typeof createDeviceBroadcast> | null = null;
 
     messenger.send({ type: 'clientLoggedIn' });
 
@@ -136,6 +136,18 @@ async function initialize() {
             device: toDeviceInfo(device),
           });
         }
+      }
+      if (msg.type === 'mainPlay') {
+        if (broadcastStream) {
+          bot.getActiveVoiceChannels().forEach(async (channel) => {
+            await bot.play(channel, broadcastStream as VoiceBroadcast);
+          });
+        }
+      }
+      if (msg.type === 'mainStop') {
+        bot.getActiveVoiceChannels().forEach((channel) => {
+          bot.silence(channel);
+        });
       }
     });
   });
