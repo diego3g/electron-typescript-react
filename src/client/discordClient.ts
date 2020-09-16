@@ -48,6 +48,14 @@ async function initialize() {
 
     messenger.send({ type: 'clientLoggedIn' });
 
+    process.on('SIGINT', () => {
+      bot.getActiveVoiceChannels().forEach((channel) => {
+        bot.leave(channel);
+      });
+      broadcastStream?.end();
+      deviceStream?.quit();
+    });
+
     listener.addListener(async (msg) => {
       if (msg.type === 'mainGetAvatar') {
         const avatarUrl = bot.getAvatarUrl();
@@ -148,6 +156,13 @@ async function initialize() {
         bot.getActiveVoiceChannels().forEach((channel) => {
           bot.silence(channel);
         });
+      }
+      if (msg.type === 'mainShutdown') {
+        bot.getActiveVoiceChannels().forEach((channel) => {
+          bot.leave(channel);
+        });
+        broadcastStream?.end();
+        deviceStream?.quit();
       }
     });
   });

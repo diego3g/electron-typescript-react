@@ -384,6 +384,10 @@ interface MainStop extends BaseMessage {
   type: 'mainStop';
 }
 
+interface MainShutdown extends BaseMessage {
+  type: 'mainShutdown';
+}
+
 export type ClientMessage =
   | MainSendToken
   | MainAvaterMessage
@@ -396,7 +400,8 @@ export type ClientMessage =
   | MainDevice
   | MainSetDevice
   | MainPlay
-  | MainStop;
+  | MainStop
+  | MainShutdown;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

@@ -74,6 +74,18 @@ export function setupMainListener(app: App, cb: () => void): void {
       clientMessenger.send({ type: 'mainSendToken', token });
     }
 
+    process.on('SIGINT', () => {
+      // clientMessenger.send({ type: 'mainShutdown' });
+      console.log('sigint, quitting');
+      clientMessenger.send({ type: 'mainShutdown' });
+      app.exit();
+    });
+
+    app.on('quit', () => {
+      // console.log('app quitting...');
+      clientMessenger.send({ type: 'mainShutdown' });
+    });
+
     listener.addListener((msg) => {
       // All of this is stuff that's sort of sequential and
       // hard to time properly, that's the reason we have
@@ -194,11 +206,6 @@ export function setupMainListener(app: App, cb: () => void): void {
 
   clientProcess.stdout?.on('data', (data) => {
     console.log(data.toString());
-  });
-
-  process.on('SIGINT', () => {
-    console.log('exiting...');
-    app.exit();
   });
 
   // ipcMain.handle('get-bot-url', () => {
