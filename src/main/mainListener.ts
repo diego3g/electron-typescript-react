@@ -139,6 +139,30 @@ export function setupMainListener(app: App, cb: () => void): void {
           voiceChannels: msg.voiceChannels,
         });
       }
+      if (msg.type === 'rendererGetVoiceChannelsInServer') {
+        clientMessenger.send({
+          type: 'mainGetChannelsInServer',
+          server: msg.server,
+        });
+      }
+      if (msg.type === 'clientSendChannelsInServer') {
+        rendererMessenger.send({
+          type: 'backendVoiceChannelsInServer',
+          voiceChannels: msg.voiceChannels,
+        });
+      }
+      if (msg.type === 'rendererJoinChannel') {
+        clientMessenger.send({
+          type: 'mainJoinChannel',
+          voiceChannel: msg.voiceChannel,
+        });
+      }
+      if (msg.type === 'rendererLeaveChannel') {
+        clientMessenger.send({
+          type: 'mainLeaveChannel',
+          voiceChannel: msg.voiceChannel,
+        });
+      }
     });
   });
 

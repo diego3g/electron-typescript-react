@@ -78,6 +78,11 @@ interface BackendActiveVoiceChannelsMessage extends BaseMessage {
   voiceChannels: VoiceChannelInfo[];
 }
 
+interface BackendVoiceChannelsInServer extends BaseMessage {
+  type: 'backendVoiceChannelsInServer';
+  voiceChannels: VoiceChannelInfo[];
+}
+
 export type RendererMessage =
   | BackendReadyMessage
   | BackendTokenMessage
@@ -85,7 +90,8 @@ export type RendererMessage =
   | BackendAvatarMessage
   | BackendNameMessage
   | BackendJoinedServersMessage
-  | BackendActiveVoiceChannelsMessage;
+  | BackendActiveVoiceChannelsMessage
+  | BackendVoiceChannelsInServer;
 
 export class RendererMessenger implements Messenger<RendererMessage> {
   private browserWindow: BrowserWindow;
@@ -152,6 +158,11 @@ interface ClientActiveVoiceChannelsMessage extends BaseMessage {
   voiceChannels: VoiceChannelInfo[];
 }
 
+interface ClientChannelsInServer extends BaseMessage {
+  type: 'clientSendChannelsInServer';
+  voiceChannels: VoiceChannelInfo[];
+}
+
 interface RendererReadyMessage extends BaseMessage {
   type: 'rendererReady';
 }
@@ -176,6 +187,21 @@ interface RendererActiveVoiceChannels extends BaseMessage {
   type: 'rendererGetActiveVoiceChannels';
 }
 
+interface RendererJoinChannel extends BaseMessage {
+  type: 'rendererJoinChannel';
+  voiceChannel: VoiceChannelInfo;
+}
+
+interface RendererLeaveChannel extends BaseMessage {
+  type: 'rendererLeaveChannel';
+  voiceChannel: VoiceChannelInfo;
+}
+
+interface RendererChannelsInServer extends BaseMessage {
+  type: 'rendererGetVoiceChannelsInServer';
+  server: ServerInfo;
+}
+
 export type MainMessage =
   | ClientReadyMessage
   | ClientLoggedInMessage
@@ -183,12 +209,16 @@ export type MainMessage =
   | ClientNameMessage
   | ClientJoinedServersMessage
   | ClientActiveVoiceChannelsMessage
+  | ClientChannelsInServer
   | RendererReadyMessage
   | RendererTokenMessage
   | RendererAvatarMessage
   | RendererNameMessage
   | RendererJoinedServersMessage
-  | RendererActiveVoiceChannels;
+  | RendererActiveVoiceChannels
+  | RendererJoinChannel
+  | RendererLeaveChannel
+  | RendererChannelsInServer;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -278,12 +308,30 @@ interface MainActiveVoiceChannelsMessage extends BaseMessage {
   type: 'mainGetActiveVoiceChannels';
 }
 
+interface MainJoinChannel extends BaseMessage {
+  type: 'mainJoinChannel';
+  voiceChannel: VoiceChannelInfo;
+}
+
+interface MainLeaveChannel extends BaseMessage {
+  type: 'mainLeaveChannel';
+  voiceChannel: VoiceChannelInfo;
+}
+
+interface MainChannelsInServer extends BaseMessage {
+  type: 'mainGetChannelsInServer';
+  server: ServerInfo;
+}
+
 export type ClientMessage =
   | MainSendToken
   | MainAvaterMessage
   | MainNameMessage
   | MainJoinedServerMessage
-  | MainActiveVoiceChannelsMessage;
+  | MainActiveVoiceChannelsMessage
+  | MainJoinChannel
+  | MainLeaveChannel
+  | MainChannelsInServer;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

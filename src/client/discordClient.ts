@@ -1,21 +1,27 @@
-import { Client } from 'discord.js';
+import { Client, Guild, VoiceChannel } from 'discord.js';
 import { BotWrapper } from './botWrapper';
-import { ClientListener, MainProcessMessenger } from '../messages';
+import {
+  ClientListener,
+  MainProcessMessenger,
+  ServerInfo,
+  VoiceChannelInfo,
+} from '../messages';
 
-interface BaseMessage {
-  type: string;
+// utility functions for returning the correct data type
+function toVoiceChannelInfo(channel: VoiceChannel): VoiceChannelInfo {
+  return {
+    id: channel.id,
+    name: channel.name,
+    serverId: channel.guild.id,
+  };
 }
 
-interface LoginMessage extends BaseMessage {
-  type: 'login';
-  token: string;
+function toServerInfo(server: Guild): ServerInfo {
+  return {
+    id: server.id,
+    name: server.name,
+  };
 }
-
-interface GetAvatarMessage extends BaseMessage {
-  type: 'getAvatar';
-}
-
-type Message = LoginMessage | GetAvatarMessage;
 
 async function initialize() {
   const listener = new ClientListener(process);
@@ -26,7 +32,7 @@ async function initialize() {
     const bot = new BotWrapper(client);
     messenger.send({ type: 'clientLoggedIn' });
 
-    listener.addListener((msg) => {
+    listener.addListener(async (msg) => {
       if (msg.type === 'mainGetAvatar') {
         const avatarUrl = bot.getAvatarUrl();
         if (avatarUrl) {
@@ -40,21 +46,60 @@ async function initialize() {
         }
       }
       if (msg.type === 'mainGetJoinedServers') {
-        const servers = bot
-          .getJoinedServers()
-          .map((server) => ({ id: server.id, name: server.name }));
+        const servers = bot.getJoinedServers().map(toServerInfo);
 
         messenger.send({ type: 'clientSendJoinedServers', servers });
       }
       if (msg.type === 'mainGetActiveVoiceChannels') {
-        const voiceChannels = bot.getActiveVoiceChannels().map((channel) => ({
-          id: channel.id,
-          serverId: channel.guild.id,
-          name: channel.name,
-        }));
+        const voiceChannels = bot
+          .getActiveVoiceChannels()
+          .map(toVoiceChannelInfo);
         messenger.send({
           type: 'clientSendActiveVoiceChannels',
           voiceChannels,
+        });
+      }
+      if (msg.type === 'mainGetChannelsInServer') {
+        const server = bot
+          .getJoinedServers()
+          .find((server) => server.id === msg.server.id);
+        if (server) {
+          const voiceChannels = bot
+            .getVoiceChannelsInServer(server)
+            .map(toVoiceChannelInfo);
+          messenger.send({ type: 'clientSendChannelsInServer', voiceChannels });
+        }
+      }
+      if (msg.type === 'mainJoinChannel') {
+        const server = bot
+          .getJoinedServers()
+          .find((server) => server.id === msg.voiceChannel.serverId);
+        if (!server) {
+          return;
+        }
+        const channel = bot
+          .getVoiceChannelsInServer(server)
+          .find((channel) => channel.id === msg.voiceChannel.id);
+
+        if (!channel) {
+          return;
+        }
+        await bot.join(channel);
+        messenger.send({
+          type: 'clientSendActiveVoiceChannels',
+          voiceChannels: bot.getActiveVoiceChannels().map(toVoiceChannelInfo),
+        });
+      }
+      if (msg.type === 'mainLeaveChannel') {
+        const channel = bot
+          .getActiveVoiceChannels()
+          .find((channel) => channel.id === msg.voiceChannel.id);
+        if (channel) {
+          bot.leave(channel);
+        }
+        messenger.send({
+          type: 'clientSendActiveVoiceChannels',
+          voiceChannels: bot.getActiveVoiceChannels().map(toVoiceChannelInfo),
         });
       }
     });

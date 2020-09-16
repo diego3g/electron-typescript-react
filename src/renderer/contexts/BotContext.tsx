@@ -31,8 +31,8 @@ type ContextType = {
   name: string;
   servers: ServerInfo[];
   activeChannels: VoiceChannelInfo[];
-  joinChannel: (channel: VoiceChannelInfo) => Promise<void>;
-  leaveChannel: (channel: VoiceChannelInfo) => Promise<void>;
+  joinChannel: (channel: VoiceChannelInfo) => void;
+  leaveChannel: (channel: VoiceChannelInfo) => void;
   token: string;
 };
 
@@ -48,11 +48,9 @@ export const BotContext = createContext<ContextType>({
   activeChannels: [],
   joinChannel() {
     console.log('joinChannel() not instantiated yet');
-    return Promise.resolve();
   },
   leaveChannel() {
     console.log('leaveChannel() not instantiated yet');
-    return Promise.resolve();
   },
   token: '',
 });
@@ -89,8 +87,11 @@ export const BotProvider: React.FC = ({ children }) => {
     }
   }, [isReady, mainMessenger, rendererListener]);
 
+  /**
+   * Once the bot is ready and logged in, we can start
+   * requesting data from it
+   */
   useEffect(() => {
-    // request data from the backend
     if (isReady && isLoggedIn && mainMessenger && rendererListener) {
       const listen = (msg: RendererMessage) => {
         if (msg.type === 'backendSendAvatar') {
@@ -115,50 +116,23 @@ export const BotProvider: React.FC = ({ children }) => {
       return () => {
         rendererListener.removeListener(listen);
       };
-      // Promise.all([
-      //   ipcRenderer.invoke('get-bot-url'),
-      //   ipcRenderer.invoke('get-bot-name'),
-      //   ipcRenderer.invoke('get-joined-servers'),
-      //   ipcRenderer.invoke('get-active-voice-channels'),
-      //   ipcRenderer.invoke('get-token'),
-      // ]).then(([url, name, servers, activeChannels, token]) => {
-      //   // setAvatarUrl(url);
-      //   setName(name);
-      //   setServers(servers);
-      //   setActiveChannels(activeChannels);
-      //   if (token) {
-      //     setToken(token);
-      //   }
-      // });
-      // // listen for responses from the backend
-      // ipcRenderer.on('clientMessage', (_e, msg) => {
-      //   if (msg.type === 'sendAvatar') {
-      //     console.log('got url');
-      //     setAvatarUrl(msg.url);
-      //   }
-      // });
     }
   }, [isLoggedIn, isReady, mainMessenger, rendererListener]);
 
   async function login(token: string) {
-    const didLogIn = await ipcRenderer.invoke('login', token);
-    setIsLoggedIn(didLogIn);
+    // const didLogIn = await ipcRenderer.invoke('login', token);
+    // setIsLoggedIn(didLogIn);
   }
 
-  async function joinChannel(channel: VoiceChannelInfo) {
-    await ipcRenderer.invoke('join-channel', channel);
-    const activeChannels = await ipcRenderer.invoke(
-      'get-active-voice-channels'
-    );
-    setActiveChannels(activeChannels);
+  function joinChannel(channel: VoiceChannelInfo) {
+    mainMessenger?.send({ type: 'rendererJoinChannel', voiceChannel: channel });
   }
 
-  async function leaveChannel(channel: VoiceChannelInfo) {
-    await ipcRenderer.invoke('leave-channel', channel);
-    const activeChannels = await ipcRenderer.invoke(
-      'get-active-voice-channels'
-    );
-    setActiveChannels(activeChannels);
+  function leaveChannel(channel: VoiceChannelInfo) {
+    mainMessenger?.send({
+      type: 'rendererLeaveChannel',
+      voiceChannel: channel,
+    });
   }
 
   const value = {

@@ -26,9 +26,7 @@ export const ChannelSelectContext = createContext<ChannelSelectContextType>(
 
 export const ChannelSelectProvider: React.FC = ({ children }) => {
   const [currentServer, setCurrentServer] = useState<ServerInfo | null>(null);
-  const voiceChannels = useVoiceChannelsInServer(
-    currentServer ? currentServer.id : ''
-  );
+  const voiceChannels = useVoiceChannelsInServer(currentServer);
 
   const value = {
     currentServer,
