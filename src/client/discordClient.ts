@@ -1,3 +1,12 @@
+/**
+ * This client is meant to be run as a forked subprocess of
+ * the main Discord process. It acts as an interface to the
+ * BotWrapper and responds to messages sent to it from "process"
+ * 
+ * @TODO might change this to use XPC on MacOS in the future
+ * https://github.com/jongear/xpc-connect
+ * https://developer.apple.com/documentation/xpc/xpc_services_connection_h
+ */
 import { Client, Guild, VoiceBroadcast, VoiceChannel } from 'discord.js';
 import { BotWrapper } from './botWrapper';
 import {

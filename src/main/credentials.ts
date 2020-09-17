@@ -1,3 +1,10 @@
+/**
+ * Functions for getting/setting Discord credentials
+ * 
+ * @NOTE currently this only covers the Discord Client
+ * Token, but keeping it generic in case we need to add
+ * more in the future
+ */
 import os from 'os';
 import keytar from 'keytar';
 

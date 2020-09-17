@@ -1,20 +1,10 @@
 /**
- * This defines an Inter-Process Communication (IPC)
- * listener for interacting with the Discord bot. We
- * need this to listen for requests for information from
- * the frontend, since we can't use all the features of
- * the Discord API directly there.
- *
- * @TODO We may want to work on expanding this eventually
- * to cover more than just "bot" messages
- *
- * @TODO Once the user's started a device stream, I can't
- * seem to exit this process without causing a segfault.
- * I'm not sure why this is. It might just be because electron
- * is buggy with these packages? If that's the case, maybe the
- * solution is to run it from a child process? Would that defeat
- * the purpose of running this in electron to begin with?
- * ~reccanti 9/7/2020
+ * This is the listener on the main process of app.
+ * It initializes the Discord Client and handles messaging
+ * between it and the renderer. 
+ * 
+ * It's also responsible for getting and setting the
+ * Discord Client Token 
  */
 
 import { App, ipcMain } from 'electron';
