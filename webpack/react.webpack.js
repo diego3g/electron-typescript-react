@@ -8,7 +8,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
     mainFields: ['main', 'module', 'browser'],
   },
-  entry: path.resolve(rootPath, 'src', 'App.tsx'),
+  entry: path.resolve(rootPath, 'src', 'renderer', 'App.tsx'),
   target: 'electron-renderer',
   devtool: 'source-map',
   module: {
@@ -23,7 +23,7 @@ module.exports = {
     ],
   },
   devServer: {
-    contentBase: path.join(rootPath, 'dist-renderer'),
+    contentBase: path.join(rootPath, 'dist/renderer'),
     historyApiFallback: true,
     compress: true,
     hot: true,
@@ -31,7 +31,7 @@ module.exports = {
     publicPath: '/',
   },
   output: {
-    path: path.resolve(rootPath, 'dist-renderer'),
+    path: path.resolve(rootPath, 'dist/renderer'),
     filename: 'js/[name].js',
     publicPath: './',
   },
