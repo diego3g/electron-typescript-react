@@ -45,6 +45,7 @@ async function initialize() {
     const bot = new BotWrapper(client);
     let deviceStream: ReturnType<typeof createAudioDevice> | null = null;
     let broadcastStream: ReturnType<typeof createDeviceBroadcast> | null = null;
+    let currentSample = 0;
 
     messenger.send({ type: 'clientLoggedIn' });
 
@@ -138,6 +139,15 @@ async function initialize() {
         );
         if (device) {
           deviceStream = createAudioDevice(device);
+          /**
+           * Before we connect our audio device to the broadcast
+           * stream, create a "data" listener that sends a sample of
+           * audio data to the frontend. We'll use this for visualizations
+           * that will let the user know the bot is listening
+           */
+          deviceStream.on('data', (buf: Buffer) => {
+            currentSample = buf.toJSON().data[0];
+          });
           broadcastStream = createDeviceBroadcast(client, deviceStream);
           messenger.send({
             type: 'clientDeviceSet',
@@ -163,6 +173,9 @@ async function initialize() {
         });
         broadcastStream?.end();
         deviceStream?.quit();
+      }
+      if (msg.type === 'mainGetSample') {
+        messenger.send({ type: 'clientSendSample', sample: currentSample });
       }
     });
   });

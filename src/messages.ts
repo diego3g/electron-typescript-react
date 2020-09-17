@@ -92,6 +92,11 @@ interface BackendDeviceSet extends BaseMessage {
   device: DeviceInfo;
 }
 
+interface BackendSendSample extends BaseMessage {
+  type: 'backendSendSample';
+  sample: number;
+}
+
 export type RendererMessage =
   | BackendReadyMessage
   | BackendTokenMessage
@@ -102,7 +107,8 @@ export type RendererMessage =
   | BackendActiveVoiceChannelsMessage
   | BackendVoiceChannelsInServer
   | BackendSendDevices
-  | BackendDeviceSet;
+  | BackendDeviceSet
+  | BackendSendSample;
 
 export class RendererMessenger implements Messenger<RendererMessage> {
   private browserWindow: BrowserWindow;
@@ -184,6 +190,11 @@ interface ClientDeviceSet extends BaseMessage {
   device: DeviceInfo;
 }
 
+interface ClientSendSample extends BaseMessage {
+  type: 'clientSendSample';
+  sample: number;
+}
+
 interface RendererReadyMessage extends BaseMessage {
   type: 'rendererReady';
 }
@@ -240,6 +251,10 @@ interface RendererStop extends BaseMessage {
   type: 'rendererStop';
 }
 
+interface RendererGetSample extends BaseMessage {
+  type: 'rendererGetSample';
+}
+
 export type MainMessage =
   | ClientReadyMessage
   | ClientLoggedInMessage
@@ -250,6 +265,7 @@ export type MainMessage =
   | ClientChannelsInServer
   | ClientSendDevices
   | ClientDeviceSet
+  | ClientSendSample
   | RendererReadyMessage
   | RendererTokenMessage
   | RendererAvatarMessage
@@ -262,7 +278,8 @@ export type MainMessage =
   | RendererDevices
   | RendererSetDevice
   | RendererPlay
-  | RendererStop;
+  | RendererStop
+  | RendererGetSample;
 
 export class IpcMainMessenger implements Messenger<MainMessage> {
   private renderer: IpcRenderer;
@@ -388,6 +405,10 @@ interface MainShutdown extends BaseMessage {
   type: 'mainShutdown';
 }
 
+interface MainGetSample extends BaseMessage {
+  type: 'mainGetSample';
+}
+
 export type ClientMessage =
   | MainSendToken
   | MainAvaterMessage
@@ -401,7 +422,8 @@ export type ClientMessage =
   | MainSetDevice
   | MainPlay
   | MainStop
-  | MainShutdown;
+  | MainShutdown
+  | MainGetSample;
 
 export class ClientMessenger implements Messenger<ClientMessage> {
   private childProcess: ChildProcess;

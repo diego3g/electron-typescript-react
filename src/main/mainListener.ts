@@ -159,6 +159,9 @@ export function setupMainListener(app: App, cb: () => void): void {
       if (msg.type === 'rendererStop') {
         clientMessenger.send({ type: 'mainStop' });
       }
+      if (msg.type === 'rendererGetSample') {
+        clientMessenger.send({ type: 'mainGetSample' });
+      }
       if (msg.type === 'clientSendAvatar') {
         rendererMessenger.send({ type: 'backendSendAvatar', url: msg.url });
       }
@@ -199,6 +202,12 @@ export function setupMainListener(app: App, cb: () => void): void {
         rendererMessenger.send({
           type: 'backendDeviceSet',
           device: msg.device,
+        });
+      }
+      if (msg.type === 'clientSendSample') {
+        rendererMessenger.send({
+          type: 'backendSendSample',
+          sample: msg.sample,
         });
       }
     });

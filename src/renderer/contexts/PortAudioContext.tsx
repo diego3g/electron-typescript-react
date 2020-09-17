@@ -5,6 +5,8 @@ import { WebContentsContext } from './WebContentsContext';
 import { RendererMessage } from '../../messages';
 import { render } from 'react-dom';
 
+const PING_INTERVAL = 500;
+
 export type DeviceInfo = {
   id: number;
   name: string;
@@ -50,21 +52,30 @@ export const PortAudioProvider: React.FC = ({ children }) => {
   }, [isReady, isLoggedIn, rendererListener, mainMessenger]);
 
   useEffect(() => {
-    if (isReady && isLoggedIn) {
+    if (isReady && isLoggedIn && mainMessenger && rendererListener) {
+      // ping for new samples at a regular interval
       let prev = 0;
-      const listen = async () => {
+      const ping = async () => {
         requestAnimationFrame(async (cur) => {
-          if (cur - prev > 500) {
+          if (cur - prev > PING_INTERVAL) {
             prev = cur;
-            const sample = await ipcRenderer.invoke('get-sample');
-            setSample(sample);
+            mainMessenger.send({ type: 'rendererGetSample' });
           }
-          listen();
+          ping();
         });
       };
-      listen();
+      ping();
+
+      // listen for responses from the server
+      const listen = (msg: RendererMessage) => {
+        if (msg.type === 'backendSendSample') {
+          setSample(msg.sample);
+        }
+      };
+      rendererListener.addListener(listen);
+      return () => rendererListener.removeListener(listen);
     }
-  }, [isLoggedIn, isReady]);
+  }, [isLoggedIn, isReady, rendererListener, mainMessenger]);
 
   const startBroadcast = (device: DeviceInfo) => {
     mainMessenger?.send({ type: 'rendererPlay' });
