@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 
-let mainWindow: Electron.BrowserWindow | null
+let mainWindow: BrowserWindow | null
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -13,7 +13,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     }
   })
 
@@ -24,12 +24,12 @@ function createWindow () {
   })
 }
 
-async function registerListeners() {
+async function registerListeners () {
   /**
    * This comes from bridge integration, check bridge.ts
    */
   ipcMain.on('message', (_, message) => {
-    console.log(message);
+    console.log(message)
   })
 }
 
