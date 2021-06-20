@@ -1,8 +1,13 @@
-import React from 'react'
-
+import { Button } from '../Button'
 import { Container, Image, Text } from './styles'
 
-const Greetings: React.FC = () => {
+export function Greetings() {
+  function handleSayHello() {
+    window.Main.sendMessage('Hello World');
+
+    console.log('Message sent! Check main process log in terminal.')
+  }
+
   return (
     <Container>
       <Image
@@ -10,8 +15,8 @@ const Greetings: React.FC = () => {
         alt="ReactJS logo"
       />
       <Text>An Electron boilerplate including TypeScript, React, Jest and ESLint.</Text>
+      <Button onClick={handleSayHello}>Send message to main process</Button>
     </Container>
   )
 }
-
-export default Greetings
+ 
