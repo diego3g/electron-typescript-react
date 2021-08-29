@@ -64,8 +64,9 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "name": "Electron starter",
-        "executableName": "electron-starter",
+        "name": "Password Manager",
+        "executableName": "password-manager",
+        "dir": "./package",
         "icon": "assets/icon",
         "extraResource": [
           "assets"
