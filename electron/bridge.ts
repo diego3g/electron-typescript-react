@@ -6,10 +6,10 @@ export const api = {
    * so they can interact with the main (electron) side
    * without security problems.
    *
-   * The function below can accessed using `window.Main.sayHello`
+   * The function below can accessed using `window.Main.sendMessage`
    */
 
-  sendMessage: (message: string) => { 
+  sendMessage: (message: string) => {
     ipcRenderer.send('message', message)
   },
 
