@@ -1,5 +1,6 @@
 import { Button } from '../Button'
 import { Container, Image, Text } from './styles'
+import ReactIcon from '../../../assets/reactjs-icon.svg';
 
 export function Greetings() {
   function handleSayHello() {
@@ -11,7 +12,7 @@ export function Greetings() {
   return (
     <Container>
       <Image
-        src="https://www.vectorlogo.zone/logos/reactjs/reactjs-icon.svg"
+        src={ReactIcon}
         alt="ReactJS logo"
       />
       <Text>An Electron boilerplate including TypeScript, React, Jest and ESLint.</Text>
