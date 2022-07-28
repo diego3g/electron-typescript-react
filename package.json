@@ -77,7 +77,7 @@
           "@electron-forge/plugin-webpack",
           {
             "mainConfig": "./webpack/main.webpack.js",
-            "devContentSecurityPolicy": "`default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:`",
+            "devContentSecurityPolicy": "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:; img-src  'self' 'unsafe-eval' 'unsafe-inline' data: https:",
             "renderer": {
               "config": "./webpack/renderer.webpack.js",
               "entryPoints": [
