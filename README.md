@@ -26,6 +26,22 @@ To generate the project package based on the OS you're running on, just run:
 yarn package
 ```
 
+## Using assets
+
+1. Place your images or icons in `assets` folder
+
+2. Read assets from `process.resourcePath` for production build, `./` for development
+
+```typescript
+// electron/main.ts
+const basePath =
+  process.env.NODE_ENV === 'development' ? '' : process.resourcesPath
+const iconImage = nativeImage.createFromPath(
+  path.resolve(basePath, 'assets', 'tray.png')
+)
+const tray = new Tray(iconImage.resize({ width: 16, height: 16 }))
+```
+
 ## Contributing
 
 Pull requests are always welcome 😃.
