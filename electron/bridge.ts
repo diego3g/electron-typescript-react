@@ -6,7 +6,7 @@ export const api = {
    * so they can interact with the main (electron) side
    * without security problems.
    *
-   * The function below can accessed using `window.Main.sendMessage`
+   * The function below can be accessed using `window.Main.sendMessage`
    */
 
   sendMessage: (message: string) => {
